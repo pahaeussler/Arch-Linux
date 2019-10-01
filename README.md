@@ -19,8 +19,9 @@
 
 Lectura y Escritura de archivos en disco virtual.
 
-| [Foro](https://github.com/IIC2333/foro-2019-2/issues?q=is%3Aissue+is%3Aopen+label%3AP1) | [Enunciado]() | [Documentacion(En OverLeaf)]() |
+| [Foro](https://github.com/IIC2333/foro-2019-2/issues?q=is%3Aissue+is%3Aopen+label%3AP1) | [Enunciado](https://github.com/pahaeussler/Arch-Linux/blob/alternative-main/crfs/dcs/Enunciado.pdf) | [Documentacion(En OverLeaf)](https://www.overleaf.com/1931382199kdckjfyqtqrt) |
 | :--: | :--: | :--: |
+|| [Ayudantía](https://github.com/pahaeussler/Arch-Linux/blob/alternative-main/crfs/dcs/AyudantiaP1.pdf) ||
 
 #### Desiciones de Diseño
 
