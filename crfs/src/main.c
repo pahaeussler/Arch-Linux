@@ -4,8 +4,6 @@ Main Code testing de Functionality of crfs.
 To Run: ./crfs $PWD/dsk/simdiskfilled.bin
 
 */
-#include "libsArchLinux/functions.h"
-#include "libsArchLinux/globals.h"
 #include "libsArchLinux/cr_API.h"
 #include <stdbool.h>
 #include <stdlib.h>

@@ -1,7 +1,7 @@
 # SPECS
 
 # Remove files not wanted
-RM = rm -rf
+RM = rm -rfv
 # Path to gcc compiler
 CC = /usr/bin/gcc
 # Compiler Flags
@@ -29,7 +29,7 @@ CFS = $(shell find $(SRC) -name '*.c')
 # .o files
 OFS = $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(CFS))
 # bin files
-BIN = scheduler
+BIN = crfs
 
 
 # RULES

@@ -15,6 +15,10 @@ typedef struct node{
     uint32_t pointer;
 } Node;
 
+
+extern char* DISKNAME;
+
+
 Node* find_node2(char** path, Node* tree, int n);
 Node* find_node(char* path, Node* tree);
 Node* create_node(uint8_t val, uint8_t *name, uint32_t pointer, Node* father);
