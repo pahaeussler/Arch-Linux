@@ -29,4 +29,4 @@ Lectura y Escritura de archivos en disco virtual.
 
 #### Información Relevante
 
-#### [Documentación Oficial]()
+#### [Documentación Oficial](https://github.com/pahaeussler/Arch-Linux/blob/alternative-main/crfs/dcs/ArchLinux_crfs_man.pdf)
