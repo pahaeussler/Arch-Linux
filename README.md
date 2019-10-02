@@ -32,3 +32,4 @@ Lectura y Escritura de archivos en disco virtual.
 Para usar el script de rápida compilación y ejecución del main escribir en consola `chmod +xwr tst`
 
 #### [Documentación Oficial](https://github.com/pahaeussler/Arch-Linux/blob/alternative-main/crfs/dcs/ArchLinux_crfs_man.pdf)
+****
