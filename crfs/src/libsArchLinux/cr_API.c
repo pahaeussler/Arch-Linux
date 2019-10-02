@@ -1,5 +1,6 @@
-#include "cr_API.h"
-#include "graph.h"
+#include "./cr_API.h"
+#include "./graph.h"
+#include "./utils.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -16,6 +17,9 @@ char* DISKNAME;
 void cr_mount(char* diskname){
     /* Funcion para montar el disco. Establece como variable global laruta local donde se encuentra el archivo.bincorrespondiente al disco */
 	DISKNAME = diskname;
+	/* TODO-> Atender CASOS BORDE:
+	 * archivo diskname no existe
+	 */
 }
 
 void cr_bitmap(unsigned block, bool hex){
