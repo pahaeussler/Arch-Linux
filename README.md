@@ -1,6 +1,6 @@
 # Arch Linux Project
 
- proyectos del curso Sistemas operativos y Redes.
+ proyectos del curso Sistemas Operativos y Redes.
 
 ## Miembros
 
