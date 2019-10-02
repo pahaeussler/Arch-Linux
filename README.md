@@ -15,7 +15,7 @@
 
 ## Proyectos
 
-### Sistemas Operativos: Cruz FileSystem
+### **Sistemas Operativos:** *Cruz FileSystem*
 
 Lectura y Escritura de archivos en disco virtual.
 
