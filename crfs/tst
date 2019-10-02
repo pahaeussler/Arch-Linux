@@ -1,0 +1,7 @@
+#!/bin/bash
+
+
+make;
+
+./crfs $PWD/dsk/simdiskfilled.bin;
+
