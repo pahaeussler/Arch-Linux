@@ -31,7 +31,7 @@ int main(int argc, char **argv){
 	// uint32_t pointer;
 	// // // int block[128];
 
-	cr_exists("/memes");
+	printf("%d\n", cr_exists("/memes/yodas.jpg"));
 
 	// FILE *test = fopen(DISKNAME, "r");
 	// // cr_mkdir("hola/chao/nosVimo/adios");

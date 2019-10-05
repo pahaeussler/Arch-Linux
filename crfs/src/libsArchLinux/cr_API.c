@@ -117,68 +117,77 @@ int get_pointer(FILE* pos){
 	int result = 0;
 	for(int i = 0; i < 4; i++)
 	{
-		fread(&pointer, 1, 1, pos);
-		result += pointer * pow(16, 2*(3-i));
+		fread(&pointer, sizeof(uint8_t), 1, pos);
+		result += ((pointer>>4)&(0xF)) * pow(16, 2*(3-i)+1) + ((pointer)&(0xF)) * pow(16, 2*(3-i));
 	}
 	// fseek(pos, -32, SEEK_CUR);
 	return result;
 }
 
-int cr_exists_recur(FILE* disk, char** path, int len, int my_dir){
+int cr_exists_recur(FILE* disk, char** path, int len, int my_dir, int from){
     printf("mi dir %d\n", my_dir);
-    for(int i = 0; i < 32; i++){
+    for(int i = 0; i < 31; i++){
         uint8_t valid;
 	    uint8_t name[27];
 	    uint32_t pointer;
         fread(&valid, sizeof(uint8_t), 1, disk);
-	    printf("%x \n", valid);
         fread(&name, sizeof(uint8_t)*27, 1, disk);
         int direction = get_pointer(disk);
         
-        printf("value: %d, name: %s, dir: %d\n", valid, name, direction);
-    //     if(valid == 32){
-    //         fseek(disk, direction*1024, SEEK_SET);
-    //         cr_exists_recur(disk, path, len);
-    //         fseek(disk, my_dir*1024, SEEK_SET);
-    //     }
-    //     else if(valid == 2 && strcmp(name, path[0]))
-    //     {
-    //         if(len == 1) return 1;
-    //         char **new_path = calloc(len-1, sizeof(char*));
-    //         for(int i = 0; i < len-1; i++){
-    //             new_path[i] = calloc(20, sizeof(char));
-    //             strcpy(new_path[i], path[i+1]);
-    //         }
-    //         fseek(disk, direction*1024, SEEK_SET);
-    //         if(cr_exists_recur(disk, new_path, len-1)) return 1;
-    //         fseek(disk, my_dir*1024, SEEK_SET);
-    //     }
+        printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
+        if(!strcmp(name, path[from]))
+        {
+            printf("len: %d\n", len);
+            if(len == 1) return 1;
+            if(valid == 2)
+            {
+                fseek(disk, direction*1024, SEEK_SET);
+                if(cr_exists_recur(disk, path, len-1, direction, from + 1)) return 1;
+                fseek(disk, my_dir*1024 + 32*(i+1), SEEK_SET);
+            }
+        }
     }
-    
+    uint8_t valid;
+	uint8_t name[27];
+	uint32_t pointer;
+    fread(&valid, sizeof(uint8_t), 1, disk);
+    fread(&name, sizeof(uint8_t)*27, 1, disk);
+    int direction = get_pointer(disk);
+    if(valid == 32){
+        fseek(disk, direction*1024, SEEK_SET);
+        cr_exists_recur(disk, path, len, direction, from);
+        fseek(disk, (my_dir + 1)*1024, SEEK_SET);
+    }
     return 0;
 }
 
 int cr_exists(char* path){
     /*Funcion para ver si un archivo o carpeta existe en la ruta especificada porpath. Retorna 1 si el archivo o carpeta existe y 0 en caso contrario. */
     FILE *disk = fopen(DISKNAME, "rb");
-    char **dir_arr = calloc(10, sizeof(char*));
-    for(int i = 0; i < 10; i++){
+    char **dir_arr = calloc(20, sizeof(char*));
+    for(int i = 0; i < 20; i++){
         dir_arr[i] = calloc(20, sizeof(char));
     }
-    char *dirname = malloc(strlen(path));
+    char *dirname = malloc(strlen(path)+1);
     strcpy(dirname, path);
     int val = 0;
     char *stok = strtok(dirname, "/");
-    while(stok != NULL && val < 10){
+    while(stok != NULL && val < 20){
         strcpy(dir_arr[val], stok);
         stok = strtok(NULL, "/");
         val++;
     }
-    cr_exists_recur(disk, dir_arr, val, 0);
-    for(int i = 0; i < 10; i++){
+    int returnado = cr_exists_recur(disk, dir_arr, val, 0, 0);
+    free(dirname);
+    for(int i = 0; i < 20; i++)
+    {
         free(dir_arr[i]);
     }
     free(dir_arr);
+    fclose(disk);
+
+    return returnado;
+    
     
 }
 
@@ -194,7 +203,7 @@ int cr_mkdir(char* foldername){
     /* Funcion para crear directorios. Crea el directorio vacio referido por foldername. */
 
     char *dirname = malloc(strlen(foldername));
-    char *dirname2 = malloc(strlen(foldername));
+    char *dirname2 = malloc(strlen(foldername)+1);
     strcpy(dirname2, foldername);
     char *stok = strtok(dirname2, "/");
     char *copy = malloc(strlen(foldername));

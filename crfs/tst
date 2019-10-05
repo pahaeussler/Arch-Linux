@@ -40,7 +40,7 @@ echo -e "${LBL}+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo -e "${LBL}|                             RUNNING CRFS                             |${NC}";
 echo -e "${LBL}|                                                                      |${NC}";
 echo -e "";
-./crfs dsk/simdiskfilled.bin;
+valgrind ./crfs dsk/simdiskfilled.bin;
 echo -e "";
 echo -e "${LBL}|                                                                      |${NC}";
 echo -e "${LBL}|                              CRFS READY                              |${NC}";
