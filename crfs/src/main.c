@@ -9,10 +9,11 @@ To Run: ./crfs $PWD/dsk/simdiskfilled.bin
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+#include <math.h>
 
 
 extern char* DISKNAME;
-
 
 int main(int argc, char **argv){
     /*
@@ -25,38 +26,71 @@ int main(int argc, char **argv){
     
     // char diskname = "simdiskformat.bin";
 	cr_mount(argv[1]);
-	uint8_t val;
-	uint8_t name[27];
-	int32_t pointer;
-	// int block[128];
+	// uint8_t val;
+	// uint8_t name[27];
+	// uint32_t pointer;
+	// // // int block[128];
 
-	FILE *test = fopen(DISKNAME, "r");
-	fread(&val, sizeof(uint8_t), 1, test);
-	printf("%x ", val);
-	fread(&name, sizeof(uint8_t)*27, 1, test);
-	printf("%s", name);
-	fread(&pointer, sizeof(uint8_t)*4, 1, test);
-	printf("%x\n", pointer);
+	cr_exists("/memes");
+
+	// FILE *test = fopen(DISKNAME, "r");
+	// // cr_mkdir("hola/chao/nosVimo/adios");
+	// fread(&val, sizeof(uint8_t), 1, test);
+	// printf("%d ", val);
+	// fread(&name, sizeof(uint8_t)*27, 1, test);
+	// printf("%s ", (char*)name);
+	// fread(&pointer, sizeof(uint8_t)*4, 1, test);
+	// printf("%x\n", pointer);
+
+	// fread(&val, sizeof(uint8_t), 1, test);
+	// printf("%d ", val);
+	// fread(&name, sizeof(uint8_t)*27, 1, test);
+	// printf("%s ", name);
+	// int result = 0;
+	// for(int i = 0; i < 4; i++)
+	// {
+	// 	fread(&pointer, sizeof(uint8_t), 1, test);
+		
+	// 	result += ((pointer>>4)&(0xF)) * pow(16, 2*(3-i)+1) + ((pointer)&(0xF)) * pow(16, 2*(3-i));
+	// 	// printf("%x\n", pointer);
+	// }
+	// printf("%d\n", result);
+
+	// fread(&val, sizeof(uint8_t), 1, test);
+	// printf("%d ", val);
+	// fread(&name, sizeof(uint8_t)*27, 1, test);
+	// printf("%s ", name);
+	// fread(&pointer, sizeof(uint32_t), 1, test);
+	// printf("%d\n", pointer);
+	// int result2 = 0;
+	// for(int i = 0; i < 4; i++)
+	// {
+	// 	fread(&pointer, sizeof(uint8_t), 1, test);
+		
+	// 	result2 += ((pointer>>4)&(0xF)) * pow(16, 2*(3-i)+1) + ((pointer)&(0xF)) * pow(16, 2*(3-i));
+	// 	// printf("%x\n", pointer);
+	// }
+	// printf("%d\n", result2);
 	// Retornar 0 significa que el programa termina sin errores
 
-	// fread(&block, 128, 1, test);
-	// printf("bloque 1\n");
-	// for (int i = 0; i < 128; i++)
-	// {
-	// 	// printf("%x\t", block[i]);
-	// 	printf(BYTE_TO_BINARY_PATTERN"\t", BYTE_TO_BINARY(block[i]));
+	// // fread(&block, 128, 1, test);
+	// // printf("bloque 1\n");
+	// // for (int i = 0; i < 128; i++)
+	// // {
+	// // 	// printf("%x\t", block[i]);
+	// // 	printf(BYTE_TO_BINARY_PATTERN"\t", BYTE_TO_BINARY(block[i]));
+	// // }
+	// // printf("\n");
+
+	// uint8_t bitmap;
+	// for(int i = 0; i < 992; i++){
+	// 	fread(&bitmap, sizeof(uint8_t), 1, test);
 	// }
-	// printf("\n");
 
-	uint8_t bitmap;
-	for(int i = 0; i < 992; i++){
-		fread(&bitmap, sizeof(uint8_t), 1, test);
-	}
-
-	unsigned block;
-	bool hex=0;
-	fread(&block, sizeof(unsigned), 1, test);
-	cr_bitmap(block, hex);
+	// unsigned block;
+	// bool hex=0;
+	// fread(&block, sizeof(unsigned), 1, test);
+	// cr_bitmap(block, hex);
 
 	// char dir[32];
 	// int i = 0;
