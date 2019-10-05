@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <string.h>
-#include "graph.h"
+#include "./graph.h"
 
 
 Node* find_node2(char** path, Node* tree, int n){
@@ -50,7 +50,7 @@ Node* create_node(uint8_t val, uint8_t *name, uint32_t pointer, Node* father){
     self->father = father;
     self->name = name;
     self->type = val;
-    self->pointer->pointer;
+    self->pointer->pointer; // error: invalid type argument of ‘->’ (have ‘uint32_t’ {aka ‘unsigned int’})
     self->next = NULL;
     self->before = NULL;
     self->child = NULL;
@@ -63,7 +63,7 @@ Node* node_init(FILE* harddrive, Node* self){
 	int32_t pointer;
     int valid = 1;
     while(valid){// #include "tree.h"
-        fread(&val, sizeof(uint8_t), 1, test);
+        fread(&val, sizeof(uint8_t), 1, test);  // error: ‘test’ undeclared (first use in this function)
 	    fread(&name, sizeof(uint8_t)*27, 1, test);
 	    fread(&pointer, sizeof(uint8_t)*4, 1, test);
         if(val!=2 || val!=4 || val!=8 ||val!=16 || val!=32){
@@ -87,7 +87,7 @@ Node* node_init(FILE* harddrive, Node* self){
     }
     
     
-    self->next = NULL
+    self->next = NULL;
     Node* before = calloc(1, sizeof(Node));
     Node* child = calloc(1, sizeof(Node));
 }

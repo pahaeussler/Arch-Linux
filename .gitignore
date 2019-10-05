@@ -1,1 +1,8 @@
+# File Extentions
 *.bin
+*.o
+*.ipynb_checkpoints
+*.vscode
+
+# Folders
+/crfs/dsk

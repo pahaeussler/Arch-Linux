@@ -1,19 +1,29 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdint.h>
+/*
 
-#include "cr_API.h"
-#include "functions.h"
-#include "globals.h"
+Main Code testing de Functionality of crfs.
+To Run: ./crfs $PWD/dsk/simdiskfilled.bin
+
+*/
+#include "libsArchLinux/cr_API.h"
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+
 
 extern char* DISKNAME;
 
 
-/** Metodo main del programa */
-int main(int argc, char *argv[])
-{
-	// char diskname = "simdiskformat.bin";
+int main(int argc, char **argv){
+    /*
+    Checking Correct Usage
+    */ 
+    if(argc != 2){
+    printf("Error: Wrong number of arguments: %d\n", argc);
+    printf("Usage: ./crfs <disk path>\n");
+    }
+    
+    // char diskname = "simdiskformat.bin";
 	cr_mount(argv[1]);
 	uint8_t val;
 	uint8_t name[27];
@@ -63,6 +73,7 @@ int main(int argc, char *argv[])
 	// 	i++;
 	// 	printf("\n\n\n");
 	// }	
-	
-	return 0;
+    
+    return 0;
 }
+

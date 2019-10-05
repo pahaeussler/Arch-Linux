@@ -1,0 +1,48 @@
+#!/bin/bash
+
+RED='\033[0;32m'  # Make color
+GRN='\033[0;34m'  # Logo color
+LGR='\033[0;36m'  # Credits color
+LBL='\033[0;33m'  # Crfs color
+NC='\033[0m'
+
+clear;
+echo -e "";
+echo -e "${RED}++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++${NC}";
+echo -e "${RED}|                             RUNNING MAKE                             |${NC}";
+echo -e "${RED}|                                                                      |${NC}";
+echo -e "";
+make;
+echo -e "";
+echo -e "${RED}|                                                                      |${NC}";
+echo -e "${RED}|                              MAKE READY                              |${NC}";
+echo -e "${RED}++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++${NC}";
+echo -e "";
+echo -e "${GRN}++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++${NC}";
+echo -e "${GRN}|                              Arch Linux                              |${NC}";
+echo -e "${GRN}|                                                                      |${NC}";
+echo -e "${GRN}|                       AA                  LLL                        |${NC}";
+echo -e "${GRN}|                      AAAA                LLL                         |${NC}";
+echo -e "${GRN}|                     AA  AA              LLL                          |${NC}";
+echo -e "${GRN}|                    AA    AA            LLL                           |${NC}";
+echo -e "${GRN}|                   AA      AA          LLL                            |${NC}";
+echo -e "${GRN}|                  AAAAAAAAAAAA        LLL                             |${NC}";
+echo -e "${GRN}|                 AAA        AAA      LLL                              |${NC}";
+echo -e "${GRN}|                AAA          AAA    LLL                               |${NC}";
+echo -e "${GRN}|               AAA            AAA   LLLLLLLLLLLLLLLLLL                |${NC}";
+echo -e "${GRN}|                                                                      |${NC}";
+echo -e "${GRN}|----------------------------------------------------------------------|${NC}";
+echo -e "${GRN}|                                                                      |${NC}";
+echo -e "${GRN}| ${LGR}By: Pablo Haeussler, Cristobal Poblete, Alfonso Aguirre, Henry Blair ${GRN}|${NC}";
+echo -e "${GRN}++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++${NC}";
+echo -e "";
+echo -e "${LBL}++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++${NC}";
+echo -e "${LBL}|                             RUNNING CRFS                             |${NC}";
+echo -e "${LBL}|                                                                      |${NC}";
+echo -e "";
+./crfs $PWD/dsk/simdiskfilled.bin;
+echo -e "";
+echo -e "${LBL}|                                                                      |${NC}";
+echo -e "${LBL}|                              CRFS READY                              |${NC}";
+echo -e "${LBL}++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++${NC}";
+echo -e "";
