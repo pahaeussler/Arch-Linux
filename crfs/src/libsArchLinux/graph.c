@@ -5,7 +5,7 @@
 #include <string.h>
 #include "./graph.h"
 
-
+/*
 Node* find_node2(char** path, Node* tree, int n){
     if (!path){
         return tree;
@@ -91,3 +91,4 @@ Node* node_init(FILE* harddrive, Node* self){
     Node* before = calloc(1, sizeof(Node));
     Node* child = calloc(1, sizeof(Node));
 }
+*/
