@@ -44,7 +44,11 @@ int cr_exists(char* path){
 
 void cr_ls(char* path){
     /*Funcion para listar los elementos de un directorio del disco. Imprime en pan-talla los nombres de todos los archivos y directorios contenidos en el directorio indicado porpath. */
-    return utilsLS(path, DISKNAME);
+    FILE *disk = fopen(DISKNAME, "r");
+    // printf("LLAMO A UTILS");
+    utilsLS(path, disk);
+    fclose(disk);
+    return;
 }
 
 int cr_mkdir(char* foldername){

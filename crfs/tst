@@ -1,5 +1,6 @@
 #!/bin/bash
-
+OP=$1
+wc $OP
 RED='\033[0;32m'  # Make color
 GRN='\033[0;34m'  # Logo color
 LGR='\033[0;36m'  # Credits color
@@ -40,7 +41,18 @@ echo -e "${LBL}+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo -e "${LBL}|                             RUNNING CRFS                             |${NC}";
 echo -e "${LBL}|                                                                      |${NC}";
 echo -e "";
-./crfs $PWD/dsk/simdiskfilled.bin;
+if [ $OP == "0" ]; 
+then
+./crfs dsk/simdiskfilled.bin;
+fi;
+if [ $OP == "1" ]; 
+then
+valgrind --leak-check=full --show-leak-kinds=all ./crfs dsk/simdiskfilled.bin;
+fi;
+if [ $OP == "2" ]; 
+then
+time ./crfs dsk/simdiskfilled.bin;
+fi;
 echo -e "";
 echo -e "${LBL}|                                                                      |${NC}";
 echo -e "${LBL}|                              CRFS READY                              |${NC}";
