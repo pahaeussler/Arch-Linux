@@ -28,7 +28,7 @@ int main(int argc, char **argv){
     }
     
     // char diskname = "simdiskformat.bin";
-// 	cr_mount(argv[1]);
+	cr_mount(argv[1]);
 	// uint8_t val;
 	// uint8_t name[27];
 	// uint32_t pointer;
@@ -53,13 +53,22 @@ int main(int argc, char **argv){
   
   
 // 	// printf("%u\n", cr_exists_direction("/memes"));
-// 	cr_mkdir("/memes");
+	// cr_mkdir("/teMeo");
+	// printf("---------------------------------\n");
+	// printf("%d\n", cr_exists(""));
+	//printf("%d\n", (2050/1024));
 // 	printf("---------------------------------\n");
 // 	printf("%d\n", cr_exists("/memeos"));
 // 	// cr_mkdir("buena/choro/comova");
 
 
+// uint32_t a = reserve_unused_block();
+// cr_bitmap(1, 0);
+// printf("%u\n", a);
+// free_used_block(a);
 
+// printf("------------------------\n");
+// cr_bitmap(1, 0);
 
 // 	printf("dir: %d\n", file_desc->block);
 // 	cr_close(file_desc);
@@ -123,8 +132,12 @@ int main(int argc, char **argv){
 	// unsigned block;
 	// bool hex=0;
 	// fread(&block, sizeof(unsigned), 1, test);
-	// cr_bitmap(block, hex);
-
+	// cr_bitmap(131, 0);
+	// printf("%d\n", 1025/1024);
+	cr_exists("/memes/doya");
+	cr_rm("memes/sudo1.jpg");
+	printf("--------------\n");
+	cr_exists("/memes/doya");
 	// char dir[32];
 	// int i = 0;
 	// while (i<10)
