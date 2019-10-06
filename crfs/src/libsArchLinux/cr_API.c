@@ -1,5 +1,4 @@
 #include "./cr_API.h"
-// #include "./graph.h"
 #include "./utils.h"
 #include <stdbool.h>
 #include <stdlib.h>
@@ -286,7 +285,11 @@ int cr_exists(char* path){
 
 void cr_ls(char* path){
     /*Funcion para listar los elementos de un directorio del disco. Imprime en pan-talla los nombres de todos los archivos y directorios contenidos en el directorio indicado porpath. */
-    /* Henry */
+    FILE *disk = fopen(DISKNAME, "r");
+    // printf("LLAMO A UTILS");
+    utilsLS(path, disk);
+    fclose(disk);
+    return;
 }
 
 uint32_t reserve_unused_block()
@@ -461,6 +464,7 @@ crFILE* cr_open(char* path, char mode){
     crfile->size = get_pointer(disk);
     fclose(disk);
     printf("dir: %d\n", crfile->block);
+
     return crfile;
 }
 
