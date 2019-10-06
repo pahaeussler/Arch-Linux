@@ -11,6 +11,9 @@ To Run: ./crfs $PWD/dsk/simdiskfilled.bin
 #include <stdio.h>
 
 
+#define getName(var) #var
+
+
 extern char* DISKNAME;
 
 
@@ -24,56 +27,40 @@ int main(int argc, char **argv){
     }
     
     // char diskname = "simdiskformat.bin";
+    printf("TEST cr_mount:\n\n");
 	cr_mount(argv[1]);
-	uint8_t val;
-	uint8_t name[27];
-	int32_t pointer;
-	// int block[128];
-
-	FILE *test = fopen(DISKNAME, "r");
-	fread(&val, sizeof(uint8_t), 1, test);
-	printf("%x ", val);
-	fread(&name, sizeof(uint8_t)*27, 1, test);
-	printf("%s", name);
-	fread(&pointer, sizeof(uint8_t)*4, 1, test);
-	printf("%x\n", pointer);
-	// Retornar 0 significa que el programa termina sin errores
-
-	// fread(&block, 128, 1, test);
-	// printf("bloque 1\n");
-	// for (int i = 0; i < 128; i++)
-	// {
-	// 	// printf("%x\t", block[i]);
-	// 	printf(BYTE_TO_BINARY_PATTERN"\t", BYTE_TO_BINARY(block[i]));
-	// }
-	// printf("\n");
-
-	uint8_t bitmap;
-	for(int i = 0; i < 992; i++){
-		fread(&bitmap, sizeof(uint8_t), 1, test);
-	}
-
-	unsigned block;
-	bool hex=0;
-	fread(&block, sizeof(unsigned), 1, test);
-	cr_bitmap(block, hex);
-
-	// char dir[32];
-	// int i = 0;
-	// while (i<10)
-	// {
-	// 	printf("Linea: %d\n", i);
-	// 	fread(&block, sizeof(uint8_t)*96, 1, test);
-	// 	fread(&val, sizeof(uint8_t), 1, test);
-	// 	printf("%x\n", val);
-	// 	fread(&name, sizeof(uint8_t)*27, 1, test);
-	// 	printf("%s\n", name);
-	// 	fread(&pointer, sizeof(uint8_t)*4, 1, test);
-	// 	printf("%x\n", pointer);
-	// 	i++;
-	// 	printf("\n\n\n");
-	// }	
+	printf("%s Montado en %s\n\n", argv[1], getName(DISKNAME));
+	
+	
+	/* LS test: Por ahora sólo están descomentados los tests que fallan */
+	
+	/*printf("TEST cr_ls:\n");
+	printf("\n\nCon input ./\n");
+	cr_ls("./");         // DONE
+	printf("\n\nCon input /\n");
+	cr_ls("/");          // DONE
+	printf("\n\nCon input vacío\n");
+	cr_ls("");           // DONE
+	printf("\n\nCon input archivo de root\n");
+	cr_ls("intro.txt");  // DONE
+	printf("\n\nCon input carpetas de root\n");
+	cr_ls("dir");       // DONE
+	printf("\n\nCon input archivo de carpeta de root\n");
+	cr_ls("memes/loops.jpg");  // DONE */
+	printf("\n\nCon input carpeta de carpeta de root\n");
+    cr_ls("dir/subdir/.");  // TODO: no hay display, no muestra nada
+    /*printf("\n\nCon input padre de root simple\n");
+    cr_ls("..");        // DONE
+    printf("\n\nCon input padre de root con slash\n");
+    cr_ls("/..");       // DONE
+    printf("\n\nCon input padre de root con punto y slash\n");
+    cr_ls("./..");/*    // DONE*/
+    printf("\n\nCon input padre de carpeta de root\n");
+    cr_ls("memes/..");  // TODO: arreglar, muestra ls para /memes (carpeta de root, debería mostrar root))
+    printf("\n\nCon input padre de carpeta de carpeta de root\n");
+    cr_ls("dir/subdir/..");  // TODO: no hay display, no muestra nada
     
+    printf("\n\n\n\n");
     return 0;
 }
 

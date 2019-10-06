@@ -11,8 +11,8 @@ void print_block(FILE *db){  // Si se necesita en alguna función puntual mover 
     for(int i = 0; i < 16; i++){
 		fread(&bitmap, 1, 1, db);
 		int k = 7;
-		for(int j = 0; j < 8; j++){
-			printf("%d ", (bitmap<<j)>>k);
+		for(int j = 7; j > -1; j--){
+			printf("%d ", (bitmap<<j)&1);
 			k++;
 		}
 		printf("\n");

@@ -5,161 +5,109 @@ CODE ADAPTED FROM: https://www.techiedelight.com/trie-implementation-insert-sear
 */
 #include "./utils.h"
 #include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
 #include <stdio.h>
 
-// Function that returns a new Trie node
-Trie* getNewTrieNode(){
-	Trie* node = (Trie*)malloc(sizeof(Trie));
-	node->isLeaf = 0;
 
-	for (int i = 0; i < CHAR_SIZE; i++)
-		node->character[i] = NULL;
-
-	return node;
+/* Definicio  de Funciones */
+void utilsLS(char *path, FILE *disk){
+    uint8_t *data = calloc(ENTRY_SIZE, sizeof(uint8_t));
+    if(!strcmp(path, "/..") || !strcmp(path, "./..") || !strcmp(path, "..")){
+        printf("ERROR: Root no tiene directorio padre [%s]", path);
+        free(data);
+        return;
+    } 
+    else if(!strcmp(path, "./") || !strcmp(path, "/") || !strcmp(path, ".") || !strcmp(path, "")){  // Path en Root
+        for(int i=0; i<BLOCK_ENTR; i++){
+            fseek(disk, ENTRY_SIZE*i, SEEK_SET);
+            fread(data, sizeof(uint8_t), ENTRY_SIZE, disk);
+            readDirEntry(data);
+        }
+    }
+    else{
+        for(int i=1; i<strlen(path); i++){
+            if(path[i] == '.' && !(path[i-1] == '/' || path[i-1] == '.')){
+                printf("ERROR: %s es un Archivo", path);
+                free(data);
+                return;
+            }    
+        }
+        unsigned int idx = 0x00;
+        char *dir = calloc(strlen(path)+1, sizeof(char));
+        strcpy(dir, path);
+        char *delim = "/";  // Delimiter for paths
+        char *ptr = strtok(dir, delim);
+        while(ptr != NULL){
+            idx = getPointer(idx, ptr, disk);
+            if(!idx){  // Directory does not exists
+                printf("%s Does not exists, Missing Dir: %s\n", path, ptr);
+                break;
+            }
+            ptr = strtok(NULL, delim);
+        }
+        for(unsigned int i=0; i<BLOCK_ENTR; i++){
+            fseek(disk, ENTRY_SIZE*i + BLOCK_SIZE*idx, SEEK_SET);
+            fread(data, sizeof(uint8_t), ENTRY_SIZE, disk);
+            readDirEntry(data);
+        }
+        free(dir);
+    }
+    free(data);
+    return;
 }
 
-// Iterative function to insert a string in Trie
-void insert(Trie *head, char* str){
-	// start from root node
-	Trie* curr = head;
-	while (*str){
-		// create a new node if path doesn't exists
-		if (curr->character[*str - 'a'] == NULL) curr->character[*str - 'a'] = getNewTrieNode();
 
-		// go to next node
-		curr = curr->character[*str - 'a'];
-
-		// move to next character
-		str++;
-	}
-
-	// mark current node as leaf
-	curr->isLeaf = 1;
+int readDirEntry(uint8_t *data){
+    char entry[DIR_NAME];
+    // if(data[0] == (uint8_t)0x01) return 0;  // Entrada Inválida
+    if(data[0] == (uint8_t)0x02){   // Subdirectorio Válido
+        strncpy(entry, data+1, DIR_NAME);
+        printf("%s\n", entry);
+    }
+    else if(data[0] == (uint8_t)0x04){  // Archivo Válido
+        strncpy(entry, data+1, DIR_NAME);
+        printf("%s\n", entry);
+    }
+    else if(data[0] == (uint8_t)0x08){  // Directorio actual
+        strncpy(entry, data+1, DIR_NAME);
+        printf("%s\n", entry);
+    }
+    else if(data[0] == (uint8_t)0x10){  // Directorio padre
+        strncpy(entry, data+1, DIR_NAME);
+        printf("%s\n", entry);
+    }
+    //else printf("\nEsto jamás lo habia visto :O\n");
+    return 0;
 }
 
-// Iterative function to search a string in Trie. It returns 1
-// if the string is found in the Trie, else it returns 0
-int search(Trie* head, char* str){
-	// return 0 if Trie is empty
-	if (head == NULL) return 0;
 
-	Trie* curr = head;
-	while (*str){
-		// go to next node
-		curr = curr->character[*str - 'a'];
-
-		// if string is invalid (reached end of path in Trie)
-		if (curr == NULL) return 0;
-		// move to next character
-		str++;
-	}
-
-	// if current node is a leaf and we have reached the
-	// end of the string, return 1
-	return curr->isLeaf;
+unsigned int getPointer(unsigned int start, char *name, FILE *disk){
+    uint8_t *data = calloc(ENTRY_SIZE, sizeof(uint8_t));
+    uint8_t entry[DIR_NAME];
+    uint8_t names[DIR_NAME];
+    unsigned int idx = start;
+    for(int i=0; i<BLOCK_ENTR; i++){
+        fseek(disk, ENTRY_SIZE*i + BLOCK_SIZE*idx, SEEK_SET);
+        fread(data, sizeof(uint8_t), ENTRY_SIZE, disk);
+        if(data[0] == (uint8_t)0x02 || data[0] == (uint8_t)0x04){
+            strncpy(entry, data+1, DIR_NAME);
+            strncpy(names, name, DIR_NAME);
+            /*printf("\nENTRY: [");
+            for (int i = 0; i < sizeof(entry); i ++) {
+                printf(" %02x", entry[i]);
+            }
+            printf("]=> %s\nNAMES: [", entry);
+            for (int i = 0; i < sizeof(names); i ++) {
+                printf(" %02x", names[i]);
+            }
+            printf("]=>%s\n", names);*/
+            if(!strcmp(entry, names)){
+                idx = (unsigned int)((unsigned int)(data[30] * 256) + (unsigned int)(data[31]));
+                break;
+            }
+        }
+    }
+    free(data);
+    return idx;
 }
-
-// returns 1 if given node has any children
-int haveChildren(Trie* curr){
-	for (int i = 0; i < CHAR_SIZE; i++)
-		if (curr->character[i])
-			return 1;	// child found
-
-	return 0;
-}
-
-// Recursive function to delete a string in Trie
-int deletion(Trie **curr, char* str){
-	// return if Trie is empty
-	if (*curr == NULL) return 0;
-
-	// if we have not reached the end of the string
-	if (*str){
-		// recur for the node corresponding to next character in
-		// the string and if it returns 1, delete current node
-		// (if it is non-leaf)
-		if (*curr != NULL && (*curr)->character[*str - 'a'] != NULL && 
-		    deletion(&((*curr)->character[*str - 'a']), str + 1) &&
-			(*curr)->isLeaf == 0){
-			if (!haveChildren(*curr)){
-				free(*curr);
-				(*curr) = NULL;
-				return 1;
-			}
-			else {
-				return 0;
-			}
-		}
-	}
-
-	// if we have reached the end of the string
-	if (*str == '\0' && (*curr)->isLeaf){
-		// if current node is a leaf node and don't have any children
-		if (!haveChildren(*curr)){
-			free(*curr); // delete current node
-			(*curr) = NULL;
-			return 1; // delete non-leaf parent nodes
-		}
-
-		// if current node is a leaf node and have children
-		else {
-			// mark current node as non-leaf node (DON'T DELETE IT)
-			(*curr)->isLeaf = 0;
-			return 0;	   // don't delete its parent nodes
-		}
-	}
-
-	return 0;
-}
-
-// Function to delete the whole Trie
-void deleteAll(Trie *head);  // TODO: Program function
-
-// Function to get correct index
-int getIndex(char letter);   //TODO: obtener indice ASCII apropiado
-
-
-/*
-// Trie Implementation in C - Insertion, Searching and Deletion
-int main(){
-	Trie* head = getNewTrieNode();
-
-	insert(head, "hello");
-	printf("%d ", search(head, "hello"));   	// print 1
-
-	insert(head, "helloworld");
-	printf("%d ", search(head, "helloworld"));  // print 1
-
-	printf("%d ", search(head, "helll"));   	// print 0 (Not present)
-
-	insert(head, "hell");
-	printf("%d ", search(head, "hell"));		// print 1
-
-	insert(head, "h");
-	printf("%d \n", search(head, "h")); 		// print 1 + newline
-
-	deletion(&head, "hello");
-	printf("%d ", search(head, "hello"));   	// print 0 (hello deleted)
-	printf("%d ", search(head, "helloworld"));  // print 1
-	printf("%d \n", search(head, "hell"));  	// print 1 + newline
-
-	deletion(&head, "h");
-	printf("%d ", search(head, "h"));   		// print 0 (h deleted)
-	printf("%d ", search(head, "hell"));		// print 1
-	printf("%d\n", search(head, "helloworld")); // print 1 + newline
-
-	deletion(&head, "helloworld");
-	printf("%d ", search(head, "helloworld"));  // print 0
-	printf("%d ", search(head, "hell"));		// print 1
-
-	deletion(&head, "hell");
-	printf("%d\n", search(head, "hell"));   	// print 0 + newline
-
-	if (head == NULL)
-		printf("Trie empty!!\n");   			// Trie is empty now
-
-	printf("%d ", search(head, "hell"));		// print 0
-
-	return 0;
-}
-*/

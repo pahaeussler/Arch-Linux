@@ -1,5 +1,4 @@
 #include "./cr_API.h"
-#include "./graph.h"
 #include "./utils.h"
 #include <stdbool.h>
 #include <stdlib.h>
@@ -45,6 +44,11 @@ int cr_exists(char* path){
 
 void cr_ls(char* path){
     /*Funcion para listar los elementos de un directorio del disco. Imprime en pan-talla los nombres de todos los archivos y directorios contenidos en el directorio indicado porpath. */
+    FILE *disk = fopen(DISKNAME, "r");
+    // printf("LLAMO A UTILS");
+    utilsLS(path, disk);
+    fclose(disk);
+    return;
 }
 
 int cr_mkdir(char* foldername){
@@ -58,15 +62,14 @@ int cr_mkdir(char* foldername){
 /* FUNCIONES DE MANEJO DE ARCHIVOS */
 crFILE*cr_open(char* path, char mode){
     /* Funci ́on para abrir un archivo. Simodees‘r’, buscael archivo en la rutapathy retorna uncrFILE*que lo representa. Simodees‘w’, se verifica que el archivono exista en la ruta especificada y se retorna un nuevocrFILE*que lo representa.*/
-    crFILE crfile;
-    if (mode =="r"){
+    crFILE *crfile;
+    if (mode =='r'){
         printf("FALTA IMPLEMENTAR R EN cr_open\n");
     }
-    else if (mode == "w")
-    {
+    else if (mode == 'w'){
         printf("FALTA IMPLEMENTAR W EN cr_open\n");
     }
-    return &crfile;
+    return crfile;
 }
  
 int cr_read(crFILE* file_desc, void* buffer, int nbytes){
