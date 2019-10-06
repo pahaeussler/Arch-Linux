@@ -28,6 +28,18 @@ int main(int argc, char **argv){
     }
 	cr_mount(argv[1]);
 
+	// FILE *fp;
+
+	// fp = fopen("myfile.txt", "w");
+	// for (int i = 0; i < 100000; i++)
+	// {
+	// 	fprintf(fp, "This is my line \t%d\n", i);
+	// 	/* code */
+	// }
+	// fclose(fp);
+	
+	// fputs("This is testing for fputs...\n", fp);
+
 	// // char* path = "/memes/yoda.jpg";
 	// char* path = "/intro.txt";
 	// char mode = "r";
@@ -47,10 +59,12 @@ int main(int argc, char **argv){
 	// }
 	// printf("\n");
 
-	char* orig = "intro.txt";
+	// char* orig = "intro.txt";
 	// char* orig = "/memes/yoda.jpg";
+	char* orig = "/memes/sudo1.jpg";
 
 	cr_unload(orig, orig);
+	// cr_load(orig, orig);
 	// cr_close(file_desc);
   return 0;
 }
