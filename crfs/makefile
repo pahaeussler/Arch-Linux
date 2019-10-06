@@ -38,7 +38,7 @@ BIN = crfs
 all: $(BIN)
 # Result from .o files
 $(BIN): $(OBJ)/$(OFS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -I$(HDR) -I$(SRC) $(OFS) -o $(BIN)
+	$(CC) $(CFLAGS) $(LDFLAGS) -I$(HDR) -I$(SRC) $(OFS) -o $(BIN) -lm
 # .o files from .c files
 $(OBJ)/%.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -I$(HDR) -I$(SRC) -c $< -o $@
