@@ -18,19 +18,19 @@ typedef struct crfile{
 /* Declaraciones de funciones generales */
 void cr_mount(char*diskname);             // DONE
 void cr_bitmap(unsigned block, bool hex); // DONE
-int cr_exists(char*path);                 // Cristobal ON IT
-void cr_ls(char*path);                    // DONE
-int cr_mkdir(char*foldername);            // TODO: faltaa
+int cr_exists(char*path);                 // DONE
+void cr_ls(char*path);                    // TODO: Fix bugs
+int cr_mkdir(char*foldername);            // Cristobal ON IT
 
 // Funciones miscelaneas
 void print_block(FILE * db);
 
 
 /* Declaraciones de funciones de manejo de archivos */
-crFILE*cr_open(char*path, char mode);                     // TODO
-int cr_read(crFILE*file_desc, void*buffer, int nbytes);   // TODO
-int cr_write(crFILE*file_desc, void*buffer, int nbytes);  // TODO
-int cr_close(crFILE*file_desc);                           // TODO
+crFILE*cr_open(char*path, char mode);                     // DONE
+int cr_read(crFILE*file_desc, void*buffer, int nbytes);   // Pablo ON IT
+int cr_write(crFILE*file_desc, void*buffer, int nbytes);  // Henry ON IT
+int cr_close(crFILE*file_desc);                           // DONE
 int cr_rm(char*path);                                     // TODO
 int cr_unload(char*orig, char*dest);                      // TODO
 int cr_load(char*orig);                                   // TODO
