@@ -102,7 +102,7 @@ unsigned int getPointer(unsigned int start, char *name, FILE *disk){
                 printf(" %02x", names[i]);
             }
             printf("]=>%s\n", names);*/
-            if(!strcmp(entry, names)){
+            if(!strcmp(entry, names)){st
                 idx = (unsigned int)((unsigned int)(data[30] * 256) + (unsigned int)(data[31]));
                 break;
             }
