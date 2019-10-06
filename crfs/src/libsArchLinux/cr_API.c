@@ -110,10 +110,10 @@ uint8_t get_valid_dir(FILE* pos){
 }
 
 
-int get_pointer(FILE* pos){
+uint32_t get_pointer(FILE* pos){
 	uint32_t pointer;
     // fseek(pos, 28, SEEK_CUR);
-	int result = 0;
+	uint32_t result = 0;
 	for(int i = 0; i < 4; i++)
 	{
 		fread(&pointer, sizeof(uint8_t), 1, pos);
@@ -122,6 +122,32 @@ int get_pointer(FILE* pos){
 	// fseek(pos, -32, SEEK_CUR);
 	return result;
 }
+
+void write_pointer(FILE* pos, uint32_t pointer)
+{
+    uint8_t final;
+	for(int i = 3; i > -1; i--)
+	{
+        final = (pointer>>8*i)&0xFF;
+		fwrite(&final, 1, 1, pos);
+	}
+}
+
+void write_name(FILE* disk, char* name)
+{
+    int zero = 27 - strlen(name);
+    int aux = 0;
+    // printf("len : %d, sizeof: %d", strlen(name), sizeof(name));
+    for(int i = 0; i < strlen(name); i++){
+        fwrite(&name[i], 1, 1, disk);
+    }
+    // fwrite(name, sizeof(name), 1, disk);
+    for(int i = 0; i < zero; i++)
+    {
+        fwrite(&aux, 1, 1, disk);
+    }
+}
+
 
 int cr_exists_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from){
     printf("mi dir %d\n", my_dir);
@@ -155,7 +181,6 @@ int cr_exists_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from)
     uint32_t direction = get_pointer(disk);
     printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
     if(valid == 32){
-        printf("Me meto\n");
         fseek(disk, direction*1024, SEEK_SET);
         cr_exists_recur(disk, path, len, direction, from);
         fseek(disk, (my_dir + 1)*1024, SEEK_SET);
@@ -164,7 +189,6 @@ int cr_exists_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from)
 }
 
 uint32_t cr_exists_direction_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from){
-    printf("mi dir %d\n", my_dir);
     for(int i = 0; i < 31; i++){
         uint8_t valid;
 	    uint8_t name[27];
@@ -173,10 +197,8 @@ uint32_t cr_exists_direction_recur(FILE* disk, char** path, int len, uint32_t my
         fread(&name, sizeof(uint8_t)*27, 1, disk);
         uint32_t direction = get_pointer(disk);
         
-        printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
         if(!strcmp(name, path[from]))
         {
-            printf("len: %d\n", len);
             if(len == 1) return direction;
             if(valid == 2)
             {
@@ -267,17 +289,118 @@ void cr_ls(char* path){
     /* Henry */
 }
 
-int cr_mkdir(char* foldername){
-    /* Funcion para crear directorios. Crea el directorio vacio referido por foldername. */
+uint32_t reserve_unused_block()
+{
+    FILE* disk = fopen(DISKNAME, "rb+");
+    uint16_t bitmap;
+    uint32_t dir = 0;
+    uint32_t dir2 = 0;
+    uint8_t to_write;
+    int value;
+    int ready = 0;
+    fseek(disk, 1024, SEEK_SET);
+    for(uint32_t i = 0; i < 1024*128; i++){
+        if(ready) break;
+        fread(&bitmap, 1, 1, disk);
 
-    char *dirname = malloc(strlen(foldername));
-    char *dirname2 = malloc(strlen(foldername)+1);
+        for(int j = 7; j > -1; j--){
+            value = (bitmap>>j)&1;
+            if(value == 0){
+                dir = 8*(i) + 7-j;
+                dir2 = i;
+                to_write = bitmap | (int)(1*pow(2, j));
+                // printf("%u %u, %d\n", to_write, bitmap, dir);
+                ready = 1;
+                break;
+            }
+        }
+    }
+    if(to_write)
+    {
+        fseek(disk, 1024 + dir2, SEEK_SET);
+        fwrite(&to_write, 1, 1, disk);
+    }
+    fclose(disk);
+    // printf("Direccion: %u\n", dir);
+    return dir;
+}
+
+uint32_t create_new_dir_cont(FILE* disk, uint32_t dir, char* name){
+    printf("eso si wea\n");
+    fseek(disk, -32, SEEK_CUR);
+    int new_valid = 32;
+    uint32_t new_block = reserve_unused_block();
+    fwrite(&new_valid, 1, 1, disk);
+    write_name(disk, name);
+    write_pointer(disk, new_block);
+    printf("%d\n", new_block);
+    return new_block;
+}
+
+int get_pos_on_directory(FILE* disk, uint32_t dir, char* dirname, char* my_name){
+    fseek(disk, dir*1024, SEEK_SET);
+    // printf("%u\n", dir);
+    for(int i = 0; i < 31; i++){
+        uint8_t valid;
+	    uint8_t name[27];
+	    uint32_t pointer;
+        fread(&valid, sizeof(uint8_t), 1, disk);
+        fread(&name, sizeof(uint8_t)*27, 1, disk);
+        uint32_t direction = get_pointer(disk);
+        
+        // printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
+        if(valid != 2 && valid != 4 && valid != 8)
+        {
+            if(valid != 16 && valid != 32)
+            {
+                uint8_t new_valid = 2;
+                uint32_t new_pointer = reserve_unused_block();
+                fseek(disk, -32, SEEK_CUR);
+                fwrite(&new_valid, 1, 1, disk);
+                write_name(disk, dirname);
+                write_pointer(disk, new_pointer);
+                return 1;
+
+            }
+        }
+    }
+    uint8_t valid;
+	uint8_t name[27];
+    uint32_t pointer;
+    fread(&valid, sizeof(uint8_t), 1, disk);
+    fread(&name, sizeof(uint8_t)*27, 1, disk);
+    uint32_t direction = get_pointer(disk);
+    if(valid == 32)
+    {
+        return get_pos_on_directory(disk, direction, dirname, my_name);
+    }
+    else
+    {
+        direction = create_new_dir_cont(disk, dir, my_name);
+        return get_pos_on_directory(disk, direction, dirname, my_name);
+    }
+    
+
+    return 0;
+}
+
+int cr_mkdir(char* foldername)
+{
+    /* Funcion para crear directorios. Crea el directorio vacio referido por foldername. */
+    FILE* disk = fopen(DISKNAME, "rb+");
+    char *dirname = malloc(strlen(foldername)+1);
+    char *aux = "";
+    strcpy(dirname, aux);
+    char *dirname2 = malloc(strlen(foldername) + 1);
     strcpy(dirname2, foldername);
     char *stok = strtok(dirname2, "/");
-    char *copy = malloc(strlen(foldername));
+    char *copy = malloc(strlen(foldername) + 1);
+    char *copy2 = malloc(strlen(foldername) + 1);
+    strcpy(copy, "..");
     while(stok != NULL){
+        strcpy(copy2, copy);
         strcpy(copy, stok);
-        printf("%s\n", stok);
+        // // printf("%s\n", stok);
         stok = strtok(NULL, "/");
         if(stok != NULL)
         {
@@ -285,12 +408,21 @@ int cr_mkdir(char* foldername){
             strcat(dirname, copy);
         }
     }
-    if(cr_exists(dirname)){
+    if(cr_exists(dirname) || !strcmp(copy2, "..")){
+        uint32_t direction = cr_exists_direction(dirname);
+        int final = get_pos_on_directory(disk, direction, copy, copy2);
+        free(dirname);
+        free(dirname2);
+        free(copy);
+        fclose(disk);
+        return final;
 
     }
     free(dirname);
     free(dirname2);
+    free(copy2);
     free(copy);
+    fclose(disk);
     return 0;
 }
 
@@ -331,7 +463,7 @@ crFILE* cr_open(char* path, char mode){
     printf("dir: %d\n", crfile->block);
     return crfile;
 }
- 
+
 int cr_read(crFILE* file_desc, void* buffer, int nbytes){
     /* Función para leer archivos. Leelos siguientes n bytes desde el archivo descrito por file_desc y los guarda en la 
     dirección apuntada por buffer. Debe retornar la cantidad de Byte efectivamente leidos desde el archivo.

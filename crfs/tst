@@ -40,9 +40,8 @@ echo -e "${LBL}+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo -e "${LBL}|                             RUNNING CRFS                             |${NC}";
 echo -e "${LBL}|                                                                      |${NC}";
 echo -e "";
-
 if [ $# -eq 1 ];  then
-    valgrind ./crfs dsk/simdiskfilled.bin;
+    valgrind --track-origins=yes ./crfs dsk/simdiskformat.bin;
 else
     ./crfs dsk/simdiskfilled.bin;
 fi

@@ -25,32 +25,41 @@ int main(int argc, char **argv){
     }
     
     // char diskname = "simdiskformat.bin";
-	cr_mount(argv[1]);
+// 	cr_mount(argv[1]);
 	// uint8_t val;
 	// uint8_t name[27];
 	// uint32_t pointer;
-	// // // int block[128];
-	char* path = "/memes/yoda.jpg";
-	char mode = "r";
+// 	// // // int block[128];
+// 	char* path = "/memes/yoda.jpg";
+// 	char mode = "r";
 	// printf("%d\n", cr_exists("/memes/yodas.jpg"));
 	// printf("%d\n", cr_exists_direction(path));
-	crFILE* file_desc = cr_open(path, mode);
-
-	int nbytes = 1;
-	// void* buffer;
-	char buffer[nbytes+1];
-	for (int i = 0; i < 10; i++)
-	{
-		cr_read(file_desc, buffer, nbytes);
-		// buffer[nbytes]=NULL;
-		printf("%s\n", buffer);
-		printf("pos: %d\n", file_desc->pos);
-	}
+// 	crFILE* file_desc = cr_open(path, mode);
 
 
+// 	int nbytes = 1;
+// 	// void* buffer;
+// 	char buffer[nbytes+1];
+// 	for (int i = 0; i < 10; i++)
+// 	{
+// 		cr_read(file_desc, buffer, nbytes);
+// 		// buffer[nbytes]=NULL;
+// 		printf("%s\n", buffer);
+// 		printf("pos: %d\n", file_desc->pos);
+// 	}
+  
+  
+// 	// printf("%u\n", cr_exists_direction("/memes"));
+// 	cr_mkdir("/memes");
+// 	printf("---------------------------------\n");
+// 	printf("%d\n", cr_exists("/memeos"));
+// 	// cr_mkdir("buena/choro/comova");
 
-	printf("dir: %d\n", file_desc->block);
-	cr_close(file_desc);
+
+
+
+// 	printf("dir: %d\n", file_desc->block);
+// 	cr_close(file_desc);
 	// void* buffer;
 	// int nbytes;
 	// crFILE* file_desc,
