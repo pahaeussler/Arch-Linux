@@ -7,9 +7,15 @@
 
 /* Definición de Structs */
 typedef struct crfile{
-    
+    bool mode; /* r=0 && w==1 */
+    bool overright;
+    int block;
+    char* path;
+    int pos;
+    int size;
 } crFILE;
 
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 /* Declaraciones de funciones generales */
 void cr_mount(char*diskname);

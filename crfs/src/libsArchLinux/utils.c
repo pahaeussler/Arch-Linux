@@ -7,6 +7,7 @@
 // #include <stdlib.h>
 // #include <stdio.h>
 
+
 // // Function that returns a new Trie node
 // Trie* getNewTrieNode(){
 // 	Trie* node = (Trie*)malloc(sizeof(Trie));
