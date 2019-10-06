@@ -9,17 +9,22 @@
 // #include <stdlib.h>
 // #include <stdio.h>
 /* Definiciones de Macros */
-#define DISK__SIZE  1048576 
+/*bytes*/
+#define DISK__SIZE  1048576
 #define BLOCK_SIZE  1024
+/* numero de entradas por bloque */
 #define BLOCK_ENTR  32
+/* Tamaño de la entrada */
 #define ENTRY_SIZE  32
 
 #define DIR__VAL  1
 #define DIR__POS  4
 #define DIR_NAME  27
 
+/* Numero de bits por bloque */
 #define BIT_BLKS  128
 
+/* Tamaño numero de bloque */
 #define IDX_SIZE  4
 #define IDX_PTRS  1008
 #define IDX_DSIM  4

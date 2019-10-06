@@ -39,7 +39,6 @@ void cr_bitmap(unsigned block, bool hex){
                     uint16_t bitmap2 = bitmap;
                     fprintf(stderr, "%x", (bitmap2>>j*4)&0x0F);
                 }
-
                 if(i%2){
                     fprintf(stderr, "\n");
                 }
@@ -109,16 +108,16 @@ uint8_t get_valid_dir(FILE* pos){
 }
 
 
-uint32_t get_pointer(FILE* pos){
+uint32_t get_pointer(FILE* disk){
 	uint32_t pointer;
-    // fseek(pos, 28, SEEK_CUR);
+    // fseek(disk, 28, SEEK_CUR);
 	uint32_t result = 0;
 	for(int i = 0; i < 4; i++)
 	{
-		fread(&pointer, sizeof(uint8_t), 1, pos);
+		fread(&pointer, sizeof(uint8_t), 1, disk);
 		result += ((pointer>>4)&(0xF)) * pow(16, 2*(3-i)+1) + ((pointer)&(0xF)) * pow(16, 2*(3-i));
 	}
-	// fseek(pos, -32, SEEK_CUR);
+	// fseek(disk, -32, SEEK_CUR);
 	return result;
 }
 
@@ -149,7 +148,7 @@ void write_name(FILE* disk, char* name)
 
 
 int cr_exists_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from){
-    printf("mi dir %d\n", my_dir);
+    // printf("mi dir %d\n", my_dir);
     for(int i = 0; i < 31; i++){
         uint8_t valid;
 	    uint8_t name[27];
@@ -158,17 +157,17 @@ int cr_exists_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from)
         fread(&name, sizeof(uint8_t)*27, 1, disk);
         uint32_t direction = get_pointer(disk);
         
-        printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
+        // printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
         if(!strcmp(name, path[from]))
         {
-            printf("len: %d\n", len);
+            // printf("len: %d\n", len);
             if(len == 1) return 1;
             if(valid == 2)
             {
                 fseek(disk, direction*1024, SEEK_SET);
                 if(cr_exists_recur(disk, path, len-1, direction, from + 1)) return 1;
                 fseek(disk, my_dir*1024 + 32*(i+1), SEEK_SET);
-                printf("he vuelto %u\n", my_dir);
+                // printf("he vuelto %u\n", my_dir);
             }
         }
     }
@@ -178,7 +177,7 @@ int cr_exists_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from)
     fread(&valid, sizeof(uint8_t), 1, disk);
     fread(&name, sizeof(uint8_t)*27, 1, disk);
     uint32_t direction = get_pointer(disk);
-    printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
+    // printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
     if(valid == 32){
         fseek(disk, direction*1024, SEEK_SET);
         cr_exists_recur(disk, path, len, direction, from);
@@ -329,14 +328,14 @@ uint32_t reserve_unused_block()
 }
 
 uint32_t create_new_dir_cont(FILE* disk, uint32_t dir, char* name){
-    printf("eso si wea\n");
+    // printf("eso si wea\n");
     fseek(disk, -32, SEEK_CUR);
     int new_valid = 32;
     uint32_t new_block = reserve_unused_block();
     fwrite(&new_valid, 1, 1, disk);
     write_name(disk, name);
     write_pointer(disk, new_block);
-    printf("%d\n", new_block);
+    // printf("%d\n", new_block);
     return new_block;
 }
 
@@ -437,11 +436,12 @@ crFILE* cr_open(char* path, char mode){
     /* Función para abrir un archivo. Si mode es‘r’, busca el archivo en la rutapathy retorna uncrFILE*que lo representa. Simodees‘w’, se verifica que el archivono exista en la ruta especificada y se retorna un nuevocrFILE*que lo representa.*/
     crFILE* crfile = malloc(sizeof(crFILE));
     int direction = cr_exists_direction(path);
-    printf("dir: %d\n", direction);
+    // printf("dir: %d\n", direction);
+    crfile -> pos_data = 0;
     crfile -> overright = 0;
     crfile -> block = direction;
+    crfile ->bytes_readed = 0;
     crfile->mode = mode == 'w';
-    crfile -> pos =0;
     crfile->path = malloc(sizeof(path)+1);
     strcpy(crfile->path, path);
     if (direction == 0){
@@ -460,10 +460,10 @@ crFILE* cr_open(char* path, char mode){
     }
     FILE* disk = fopen(DISKNAME, "rb");
     fseek(disk, crfile->block*1024, SEEK_SET);
-    // fread(&crfile->size, 4, 1, disk);
+    // fread(&crfile->size, 1, IDX_SIZE, disk);
     crfile->size = get_pointer(disk);
+    crfile -> pos_index = 4;
     fclose(disk);
-    printf("dir: %d\n", crfile->block);
 
     return crfile;
 }
@@ -481,27 +481,61 @@ int cr_read(crFILE* file_desc, void* buffer, int nbytes){
 
     // uint16_t bitmap;
     FILE* disk = fopen(DISKNAME, "rb");
-    fseek(disk, (file_desc->block+1)*1024+file_desc->pos, SEEK_SET);
-    int n_bytes = min(nbytes, file_desc->size - file_desc->pos);
-    // fread(&buffer, sizeof(unsigned char), 1, disk);
-    file_desc->pos += sizeof(uint8_t)*27;
+    fseek(disk, (file_desc->block)*BLOCK_SIZE + file_desc->pos_index, SEEK_SET);
+    uint32_t pointer = get_pointer(disk);
+    // printf("Pointer:\t%u\n", pointer*BLOCK_SIZE+file_desc->pos_data);
+    fseek(disk, pointer*BLOCK_SIZE+file_desc->pos_data, SEEK_SET);
+    // printf("pointer*BLOCK_SIZE+file_desc->pos_data %d\n", pointer*BLOCK_SIZE+file_desc->pos_data);
+
+    // nbytes???
+    int byte = 0;
+    for (byte; byte < nbytes; byte++)
+    {
+        file_desc ->pos_data ++;
+        fread(buffer + byte, 1, 1, disk);
+        if (file_desc->bytes_readed >= file_desc->size){
+            printf("bytes_readed %d >= size %d\n", file_desc->bytes_readed, file_desc->size);
+            return byte;
+
+        }
+        if ((file_desc->bytes_readed % 1024 == 0) && (file_desc->bytes_readed)){
+            file_desc -> pos_index ++;
+            file_desc -> pos_data =0;
+            fseek(disk, (file_desc->block)*BLOCK_SIZE+file_desc->pos_index, SEEK_SET);
+            pointer = get_pointer(disk);
+            // printf("Cambio de pointer:\t%u\tindice:\t%d\tbytes_readed:\t%d\n", pointer, file_desc -> pos_index, file_desc->bytes_readed);
+            // printf("Intentando de leer %d\n", (file_desc->block)*BLOCK_SIZE+file_desc->pos_index);
+        }
+        file_desc->bytes_readed++;
+
+    }
 
 
 
 
-    uint8_t name[27];
-    fread(&name, sizeof(uint8_t)*27, 2048, disk);
-    printf("name: %s\n", name);
-    // int i;
-    // for (int i = 0; i < nbytes; i++)
-    // {
-    //     printf("%c", buffer[i]);
-    // }
-    // printf("\n");
-    fclose(disk);
+
+
+
+    // int n_bytes = min(nbytes, file_desc->size - file_desc->pos);
+    // // fread(&buffer, sizeof(unsigned char), 1, disk);
+    // file_desc->pos += sizeof(uint8_t)*27;
+
+
+
+
+    // uint8_t name[27];
+    // fread(&name, sizeof(uint8_t)*27, 2048, disk);
+    // printf("name: %s\n", name);
+    // // int i;
+    // // for (int i = 0; i < nbytes; i++)
+    // // {
+    // //     printf("%c", buffer[i]);
+    // // }
+    // // printf("\n");
+    // fclose(disk);
     
     // fread(&bitmap, 1, 1, disk);
-    return n_bytes;
+    return byte;
 }
 
 int cr_write(crFILE* file_desc, void* buffer, int nbytes){
@@ -522,12 +556,85 @@ int cr_rm(char* path){
 }
 
 int cr_unload(char* orig, char* dest){
-    /* Función que se encarga de copiar un archivo o un ́arbolde directorios (es decir, un directorio ytodossus contenidos) del disco, referenciado por orig, hacia un nuevo archivo o directorio de rutadesten su computador.*/
+    /* Función que se encarga de copiar un archivo o un ́arbol de directorios
+    (es decir, un directorio y todos sus contenidos) del disco, referenciado por orig,
+    hacia un nuevo archivo o directorio de ruta desten su computador.*/
+
+
+	char mode = "r";
+	crFILE* file_desc = cr_open(orig, mode);
+    FILE* destiny = fopen(dest, "wb");
+	int nbytes = 32;
+	char buffer[nbytes+1];
+	buffer[nbytes] = '\0';
+	printf("size: %d\n", file_desc->size);
+
+
+    while (cr_read(file_desc, buffer, nbytes))
+    {
+        fwrite(buffer, nbytes, 1, destiny);
+		printf("%s", buffer);
+    }
+    fclose(destiny);
+    cr_close(file_desc);
+
+
+    // char c = '\0';
+    // while(1)
+    // {
+    //     // read offset byte
+    //     c = fgetc(file_desc);
+ 
+    //     // if it reached EOF
+    //     if(c == EOF)
+    //         break;
+ 
+    //     // write offset byte
+    //     fputc(c, destiny);
+    // }
+    // fclose(destiny);
+    
+    // char c = '\0';
+    // while(1)
+    // {
+    //     // read offset byte
+    //     c = fgetc(file_desc);
+ 
+    //     // if it reached EOF
+    //     if(c == EOF)
+    //         break;
+ 
+    //     // write offset byte
+    //     fputc(c, destiny);
+    // }
+    // fclose(destiny);
+    // cr_close(file_desc);
+
+
+    // cr_close(file_desc);
+
+
+
+	// for (int i = 0; i < 1020; i++)
+	// {
+	// 	cr_read(file_desc, buffer, nbytes);
+	// 	// buffer[nbytes]=NULL;
+	// 	// printf("pos index: %d\tpos data: %d\n", file_desc->pos_index, file_desc->pos_data);
+	// }
+
+
+    //     fread(buffer + byte, 1, 1, disk);
+    //    size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+
+
     return 0;
 }
 
 int cr_load(char* orig){
-    /* Función que se encarga de copiar un archivo o ́arbol de directorios, referenciado por origal disco. En caso de que un archivo sea demasiado pesado para el disco, se debe escribir todo lo posible hasta acabar el espacio disponible.*/
+    /* Función que se encarga de copiar un archivo o ́arbol de directorios,
+    referenciado por origal disco. En caso de que un archivo sea demasiado
+    pesado para el disco, se debe escribir todo lo posible hasta acabar el
+    espacio disponible.*/
     return 0;
 }
 
