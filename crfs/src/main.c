@@ -30,9 +30,30 @@ int main(int argc, char **argv){
 	// uint8_t name[27];
 	// uint32_t pointer;
 	// // // int block[128];
+	char* path = "/memes/yoda.jpg";
+	char mode = "r";
+	// printf("%d\n", cr_exists("/memes/yodas.jpg"));
+	// printf("%d\n", cr_exists_direction(path));
+	crFILE* file_desc = cr_open(path, mode);
 
-	printf("%d\n", cr_exists("/memes/yodas.jpg"));
+	int nbytes = 1;
+	// void* buffer;
+	char buffer[nbytes+1];
+	for (int i = 0; i < 10; i++)
+	{
+		cr_read(file_desc, buffer, nbytes);
+		// buffer[nbytes]=NULL;
+		printf("%s\n", buffer);
+		printf("pos: %d\n", file_desc->pos);
+	}
 
+
+
+	printf("dir: %d\n", file_desc->block);
+	cr_close(file_desc);
+	// void* buffer;
+	// int nbytes;
+	// crFILE* file_desc,
 	// FILE *test = fopen(DISKNAME, "r");
 	// // cr_mkdir("hola/chao/nosVimo/adios");
 	// fread(&val, sizeof(uint8_t), 1, test);
@@ -106,7 +127,9 @@ int main(int argc, char **argv){
 	// 	printf("%x\n", pointer);
 	// 	i++;
 	// 	printf("\n\n\n");
-	// }	
+	// }
+
+	printf("End\n");
     
     return 0;
 }
