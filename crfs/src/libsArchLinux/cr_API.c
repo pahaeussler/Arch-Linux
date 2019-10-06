@@ -27,6 +27,8 @@ void cr_bitmap(unsigned block, bool hex){
     /* Función  para  imprimir  elbitmap.  Cada  vez  quese llama esta función, imprime enstderrel estado actual del bloque debitmapcorrespondiente ablock(bitmapblock∈{1, ...,129}), ya sea en binario (sihexesfalse) o en hexadecimal (sihexestrue). Sise ingresablock= 0, se debe imprimirel bitmap completo, imprimiendo ademas una linea con la cantidad de bloques ocupados, y una segunda linea con la cantidad de bloques libres.*/
     FILE* disk = fopen(DISKNAME, "rb");
     fseek(disk, 1024, SEEK_SET);
+    uint32_t free = 0;
+    uint32_t ocupied = 0;
     if (hex){
         uint16_t bitmap;
         if((130 > block) && (block > 0))
@@ -48,17 +50,24 @@ void cr_bitmap(unsigned block, bool hex){
         else if(block == 0)
         {
             fprintf(stderr, "pass");
-            for(int i = 0; i < 1024*128; i++){
+            for(uint32_t i = 0; i < 1024*128; i++){
                 fread(&bitmap, 1, 1, disk);
                 for(int j = 1; j > -1; j--){
                     uint16_t bitmap2 = bitmap;
                     fprintf(stderr, "%x", (bitmap2>>j*4)&0x0F);
+                    ocupied += (bitmap2>>j*4)&0x0F;
+                    free = 128*1024 - ocupied;
                 }
 
                 if(i%2){
                     fprintf(stderr, "\n");
                 }
             }
+            fprintf(stderr, "ocupied: %u\n", ocupied);
+            fprintf(stderr, "free: %u\n", free);
+        }
+        else{
+            printf("El bloque bitmap ingresado es invalido");
         }
 
     }
@@ -83,29 +92,27 @@ void cr_bitmap(unsigned block, bool hex){
         /* Bloque directorio */
         else if(block == 0)
         {
-            for(int i = 0; i < 1024*128; i++){
+            for(uint32_t i = 0; i < 1024*128; i++){
                 fread(&bitmap, 1, 1, disk);
 
                 for(int j = 7; j > -1; j--){
                     uint16_t bitmap2 = bitmap;
                     fprintf(stderr, "%d", (bitmap2>>j)&1);
+                    if((bitmap2>>j)&1) ocupied++;
+                    else free++;
                 }
                 if(i%2){
-                    fprintf(stderr, "\n");
+                    fprintf(stderr, "   %u \n", i/2);
                 }
             }
+            fprintf(stderr, "ocupied: %u\n", ocupied);
+            fprintf(stderr, "free: %u\n", free);
+        }
+        else{
+            printf("El bloque bitmap ingresado es invalido");
         }
     }
     fclose(disk);
-}
-
-uint8_t get_valid_dir(FILE* pos){
-    uint8_t dato;
-	int32_t pointer;
-	fread(&dato, sizeof(uint8_t), 1, pos);
-	fseek(pos, -1, SEEK_CUR);
-    return dato;
-
 }
 
 
@@ -147,6 +154,17 @@ void write_name(FILE* disk, char* name)
     }
 }
 
+void write_zero(FILE* disk)
+{
+    int aux = 0;
+    // printf("len : %d, sizeof: %d", strlen(name), sizeof(name));
+
+    // fwrite(name, sizeof(name), 1, disk);
+    for(int i = 0; i < 27; i++)
+    {
+        fwrite(&aux, 1, 1, disk);
+    }
+}
 
 int cr_exists_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from){
     printf("mi dir %d\n", my_dir);
@@ -328,6 +346,43 @@ uint32_t reserve_unused_block()
     return dir;
 }
 
+void free_used_block(uint32_t dir)
+{
+    FILE* disk = fopen(DISKNAME, "rb+");
+    uint16_t bitmap = 0;
+    uint32_t dir2 = 0;
+    uint16_t to_write = 0;
+    int value;
+    int ready = 0;
+    fseek(disk, 1024, SEEK_SET);
+    for(uint32_t i = 0; i < 1024*128; i++){
+        if(ready) break;
+        fread(&bitmap, 1, 1, disk);
+
+        for(int j = 7; j > -1; j--){
+            value = (bitmap>>j)&1;
+            // printf("%d, %u\n", value, (i*8)+7-j);
+            if(value && (i*8)+7-j == dir){
+                dir2 = i;
+                to_write = bitmap & (255 - (int)pow(2, j));
+                // printf("%u %u, %d\n", to_write, bitmap, dir2);
+                ready = 1;
+                break;
+            }
+            else
+            {
+                to_write = bitmap;
+            }
+            
+        }
+    }
+    fseek(disk, 1024 + dir2, SEEK_SET);
+    // printf("%u, %u, %u\n", to_write, dir2, dir);
+    fwrite(&to_write, 1, 1, disk);
+    fclose(disk);
+    // printf("Direccion: %u\n", dir);
+}
+
 uint32_t create_new_dir_cont(FILE* disk, uint32_t dir, char* name){
     printf("eso si wea\n");
     fseek(disk, -32, SEEK_CUR);
@@ -338,6 +393,20 @@ uint32_t create_new_dir_cont(FILE* disk, uint32_t dir, char* name){
     write_pointer(disk, new_block);
     printf("%d\n", new_block);
     return new_block;
+}
+
+void write_dir_father(FILE* disk, uint32_t dir, uint32_t father_dir)
+{
+    int father = 16;
+    int me = 8;
+    fseek(disk, dir*1024, SEEK_SET);
+    fwrite(&father, 1, 1, disk);
+    write_name(disk, "..");
+    write_pointer(disk, father_dir);
+    fwrite(&me, 1, 1, disk);
+    write_name(disk, ".");
+    write_pointer(disk, dir);
+
 }
 
 int get_pos_on_directory(FILE* disk, uint32_t dir, char* dirname, char* my_name){
@@ -362,6 +431,7 @@ int get_pos_on_directory(FILE* disk, uint32_t dir, char* dirname, char* my_name)
                 fwrite(&new_valid, 1, 1, disk);
                 write_name(disk, dirname);
                 write_pointer(disk, new_pointer);
+                write_dir_father(disk, new_pointer, dir);
                 return 1;
 
             }
@@ -383,12 +453,12 @@ int get_pos_on_directory(FILE* disk, uint32_t dir, char* dirname, char* my_name)
         return get_pos_on_directory(disk, direction, dirname, my_name);
     }
     
-
     return 0;
 }
 
 int cr_mkdir(char* foldername)
 {
+    if(cr_exists(foldername)) return 0;
     /* Funcion para crear directorios. Crea el directorio vacio referido por foldername. */
     FILE* disk = fopen(DISKNAME, "rb+");
     char *dirname = malloc(strlen(foldername)+1);
@@ -417,6 +487,7 @@ int cr_mkdir(char* foldername)
         free(dirname);
         free(dirname2);
         free(copy);
+        free(copy2);
         fclose(disk);
         return final;
 
@@ -516,8 +587,120 @@ int cr_close(crFILE* file_desc){
     return 0;
 }
 
+void rm_index(FILE* disk, uint32_t dir)
+{
+    fseek(disk, dir*1024, SEEK_SET);
+    uint32_t file_size = get_pointer(disk);
+    int size = 251;
+    if((file_size-1)/1024 <= 251) size = (file_size-1)/1024;  
+    for(int i = 0; i <= size; i++)
+    {
+        uint32_t pointer = get_pointer(disk);
+        free_used_block(pointer);
+    }
+    if((file_size-1)/1024 > 251)
+    {
+        uint32_t new_pointer = get_pointer(disk);
+        fseek(disk, new_pointer*1024, SEEK_SET);
+        size = 255;
+        if((file_size-1)/1024 <= 507) size = ((file_size-1)/1024) - 252;
+        for(int i = 0; i <= size; i++)
+        {
+            uint32_t pointer = get_pointer(disk);
+            free_used_block(pointer);
+        }
+        free_used_block(new_pointer);
+        //doble
+        if((file_size-1)/1024 > 507)
+        {
+            fseek(disk, dir*1024 + 1016, SEEK_SET);
+            uint32_t second_pointer = get_pointer(disk);
+            int nivel = 0;
+            uint32_t aux = file_size - 252 - 256;
+            while(aux)
+            {
+                fseek(disk, second_pointer*1024 + nivel*4, SEEK_SET);
+                new_pointer = get_pointer(disk);
+                nivel++;
+                fseek(disk, new_pointer, SEEK_SET);
+                int nivel2 = 256;
+                while(aux && nivel2)
+                {
+                    uint32_t second_level_pointer = get_pointer(disk);
+                    nivel2--;
+                    free_used_block(second_level_pointer);
+                    aux--;
+                }
+                free_used_block(new_pointer);
+
+            }
+
+            // //triple
+            // if((file_size-1)/1024 > 66043)
+            // {
+
+            // }
+
+        }
+
+    }
+}
+
+int change_dir_file(FILE* disk, uint32_t dir, char* filename)
+{
+    fseek(disk, dir*1024, SEEK_SET);
+    printf("dir: %u, file_name: %s\n", dir, filename);
+    for(int i = 0; i < 31; i++){
+        uint8_t valid;
+	    uint8_t name[27];
+        fread(&valid, sizeof(uint8_t), 1, disk);
+        fread(&name, sizeof(uint8_t)*27, 1, disk);
+        uint32_t direction = get_pointer(disk);
+        if(valid == 4 && !strcmp(name, filename)){
+            int cero = 0;
+            uint32_t new_dir = 0;
+            fseek(disk, -32, SEEK_CUR);
+            fwrite(&cero, 1, 1, disk);
+            write_zero(disk);
+            write_pointer(disk, new_dir);
+            rm_index(disk, direction);
+            free_used_block(direction);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int cr_rm(char* path){
     /* Función para borrar archivos. Elimina el archivo referenciado por la ruta path del directorio correspondiente. Los bloques que estaban siendo usados por el archivo deben quedar libres.*/
+    if(!cr_exists(path)) return 0;
+    FILE* disk = fopen(DISKNAME, "rb+");
+    char *dirname = malloc(strlen(path)+1);
+    char *aux = "";
+    strcpy(dirname, aux);
+    char *dirname2 = malloc(strlen(path) + 1);
+    strcpy(dirname2, path);
+    char *stok = strtok(dirname2, "/");
+    char *copy = malloc(strlen(path) + 1);
+    strcpy(copy, "..");
+    while(stok != NULL){
+        strcpy(copy, stok);
+        // // printf("%s\n", stok);
+        stok = strtok(NULL, "/");
+        if(stok != NULL)
+        {
+            strcat(dirname, "/");
+            strcat(dirname, copy);
+        }
+    }
+    uint32_t direction = cr_exists_direction(dirname);
+    int final = change_dir_file(disk, direction, copy);
+    free(dirname);
+    free(dirname2);
+    free(copy);
+    fclose(disk);
+    return final;
+
     return 0;
 }
 
