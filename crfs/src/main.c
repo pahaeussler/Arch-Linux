@@ -59,11 +59,19 @@ int main(int argc, char **argv){
 	// }
 	// printf("\n");
 
-	// char* orig = "intro.txt";
 	char* orig = "memes/yoda.jpg";
 	// char* orig = "dir/texto.txt";
 	// char* orig = "Withered Leaf.mp3";
-	char* out = "out.txt";
+	// char* out = "embeces.jpg";
+	
+	
+	// char* orig = "intro.txt";
+	// char* out = "out.txt";
+
+
+	// char* orig = "/embeces.jpg";
+	char* out = "results/out.jpg";
+	
 	// char* orig = "memes/sudo1.jpg";
 
 	cr_unload(orig, out);
