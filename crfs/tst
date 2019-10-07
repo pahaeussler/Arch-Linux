@@ -56,7 +56,7 @@ time ./crfs dsk/simdiskfilled.bin;
 fi;
 if [ $OP == "3" ]; 
 then
-valgrind --track-origins=yes ./crfs dsk/simdiskformat.bin;
+valgrind --track-origins=yes ./crfs dsk/simdiskfilled.bin;
 fi;
 if [ $OP == "4" ]; 
 then

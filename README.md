@@ -29,7 +29,18 @@ Lectura y Escritura de archivos en disco virtual.
 
 #### Información Relevante
 
-Para usar el script de rápida compilación y ejecución del main escribir en consola `chmod +xwr tst`, finalmente para correrlo: `./tst`
+Para usar el script de rápida compilación y ejecución del main escribir en consola `chmod +xwr tst`, finalmente para correrlo: `./tst [num_op]`
+
+| num_op | comando |
+| :--: | :-- |
+| `0` | ./crfs dsk/simdiskfilled.bin |
+| `1` | valgrind --leak-check=full --show-leak-kinds=all ./crfs dsk/simdiskfilled.bin |
+| `2` | time ./crfs dsk/simdiskfilled.bin |
+| `3` | valgrind --track-origins=yes ./crfs dsk/simdiskformat.bin |
+| `4` | valgrind ./crfs dsk/simdiskformat.bin |
+| `5` | make clean |
+
+
 
 #### [Documentación Oficial](https://github.com/pahaeussler/Arch-Linux/blob/alternative-main/crfs/dcs/ArchLinux_crfs_man.pdf)
 ****
