@@ -529,7 +529,7 @@ int parse_dir_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from,
 }
 
 
-void parse_dir(char* orig, char* dest){
+int cr_unload(char* orig, char* dest){
     /*Funcion para listar los elementos de un directorio del disco. Imprime en pan-talla los nombres de todos los archivos y directorios contenidos en el directorio indicado porpath. */
     // FILE *disk = fopen(DISKNAME, "rb");
     if(cr_exists(orig))
@@ -556,7 +556,9 @@ void parse_dir(char* orig, char* dest){
         }
         free(dir_arr);
         fclose(disk);
+        return 1;
     }
+    return 0;
 }
 
 uint32_t reserve_unused_block()
@@ -981,11 +983,6 @@ int cr_rm(char* path){
     fclose(disk);
     return final;
 
-    return 0;
-}
-
-int cr_unload(char* orig, char* dest){
-    /* Función que se encarga de copiar un archivo o un ́arbolde directorios (es decir, un directorio ytodossus contenidos) del disco, referenciado por orig, hacia un nuevo archivo o directorio de rutadesten su computador.*/
     return 0;
 }
 
