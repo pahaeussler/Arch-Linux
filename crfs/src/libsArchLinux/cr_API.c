@@ -882,7 +882,7 @@ int cr_write(crFILE* file_desc, void* buffer, int nbytes){
     int byte = 0;
     while (file_desc->pos_index < IDX_PTRS+4)
     {
-        if (file_desc->bytes_readed >= file_desc->size){
+        if (file_desc->bytes_written >= file_desc->size){
             fclose(disk);
             return byte;
         }
