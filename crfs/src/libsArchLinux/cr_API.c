@@ -632,38 +632,72 @@ int cr_read(crFILE* file_desc, void* buffer, int nbytes){
     La lectura dereadse efectúa desde la posicióndel archivo inmediatamente posterior a la última
     posición leída por un llamado a read.*/
 
-    // fread(&buffer[i], nbytes, 1, test)
-	//     i++;
-    // }
-
-    // uint16_t bitmap;
     FILE* disk = fopen(DISKNAME, "rb");
-    fseek(disk, (file_desc->block+1)*1024+file_desc->pos, SEEK_SET);
-    int n_bytes = min(nbytes, file_desc->size - file_desc->pos);
-    // fread(&buffer, sizeof(unsigned char), 1, disk);
-    file_desc->pos += sizeof(uint8_t)*27;
-
-
-
-
-    uint8_t name[27];
-    fread(&name, sizeof(uint8_t)*27, 2048, disk);
-    printf("name: %s\n", name);
-    // int i;
-    // for (int i = 0; i < nbytes; i++)
-    // {
-    //     printf("%c", buffer[i]);
-    // }
-    // printf("\n");
+    fseek(disk, (file_desc->block)*BLOCK_SIZE + file_desc->pos_index, SEEK_SET);
+    uint32_t pointer = get_pointer(disk);
+    // printf("Leyendo en:\t%u\n", pointer*BLOCK_SIZE+file_desc->pos_data);
+    fseek(disk, pointer*BLOCK_SIZE + file_desc->pos_data, SEEK_SET);
+    // printf("pointer*BLOCK_SIZE+file_desc->pos_data %d\n", pointer*BLOCK_SIZE+file_desc->pos_data);
+    int byte = 0;
+    while (file_desc->pos_index < IDX_PTRS+4)
+    {
+        if (file_desc->bytes_readed >= file_desc->size){
+            // printf("bytes_readed %d >= size %d\n", file_desc->bytes_readed, file_desc->size);
+            fclose(disk);
+            return byte;
+        }
+        
+        read(file_desc, buffer, pointer, byte);
+        byte ++;
+        if (byte == nbytes)
+        {
+            fclose(disk);
+            return byte;
+        }
+        if (file_desc->bytes_readed % BLOCK_SIZE == 0){
+            file_desc->pos_data = 0;
+            file_desc->pos_index += 4;
+            fseek(disk, (file_desc->block)*BLOCK_SIZE + file_desc->pos_index, SEEK_SET);
+            uint32_t pointer = get_pointer(disk);
+        }
+    }
     fclose(disk);
-    
-    // fread(&bitmap, 1, 1, disk);
-    return n_bytes;
-}
-
+    return byte;
 int cr_write(crFILE* file_desc, void* buffer, int nbytes){
     /* Función para escribir archivos. Escribe en el archivo descrito por filedesc los nbytes que se encuentren en la dirección indicada por buffer. Retorna la cantidad de Byte escritos en el archivo. Si se produjo un error porque no pudo seguirescribiendo, ya sea porque el disco se llenó o porque el archivo no puede crecer m ́as, este número puede sermenor anbytes(incluso0).*/
-    return 0;
+    int bytes_written = 0;
+    
+    FILE* disk = fopen(DISKNAME, "wb");
+    fseek(disk, (file_desc->block)*BLOCK_SIZE + file_desc->pos_index, SEEK_SET);
+    uint32_t pointer = get_pointer(disk);
+    // printf("Leyendo en:\t%u\n", pointer*BLOCK_SIZE+file_desc->pos_data);
+    fseek(disk, pointer*BLOCK_SIZE + file_desc->pos_data, SEEK_SET);
+    // printf("pointer*BLOCK_SIZE+file_desc->pos_data %d\n", pointer*BLOCK_SIZE+file_desc->pos_data);
+    int byte = 0;
+    while (file_desc->pos_index < IDX_PTRS+4)
+    {
+        if (file_desc->bytes_readed >= file_desc->size){
+            // printf("bytes_readed %d >= size %d\n", file_desc->bytes_readed, file_desc->size);
+            fclose(disk);
+            return byte;
+        }
+        
+        read(file_desc, buffer, pointer, byte);
+        byte ++;
+        if (byte == nbytes)
+        {
+            fclose(disk);
+            return byte;
+        }
+        if (file_desc->bytes_readed % BLOCK_SIZE == 0){
+            file_desc->pos_data = 0;
+            file_desc->pos_index += 4;
+            fseek(disk, (file_desc->block)*BLOCK_SIZE + file_desc->pos_index, SEEK_SET);
+            uint32_t pointer = get_pointer(disk);
+        }
+    }
+    fclose(disk);
+    return byte;
 }
 
 int cr_close(crFILE* file_desc){
