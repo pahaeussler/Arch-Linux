@@ -60,10 +60,13 @@ int main(int argc, char **argv){
 	// printf("\n");
 
 	// char* orig = "intro.txt";
-	// char* orig = "/memes/yoda.jpg";
-	char* orig = "/memes/sudo1.jpg";
+	char* orig = "memes/yoda.jpg";
+	// char* orig = "dir/texto.txt";
+	// char* orig = "Withered Leaf.mp3";
+	char* out = "out.txt";
+	// char* orig = "memes/sudo1.jpg";
 
-	cr_unload(orig, orig);
+	cr_unload(orig, out);
 	// cr_load(orig, orig);
 	// cr_close(file_desc);
   return 0;

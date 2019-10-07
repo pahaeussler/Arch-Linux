@@ -643,31 +643,57 @@ int cr_rm(char* path){
     return 0;
 }
 
-int cr_unload(char* orig, char* dest){
-    /* Función que se encarga de copiar un archivo o un ́arbol de directorios
-    (es decir, un directorio y todos sus contenidos) del disco, referenciado por orig,
-    hacia un nuevo archivo o directorio de ruta desten su computador.*/
-
-
+int unload_file(char* orig, char* dest){
 	char mode = 'r';
 	crFILE* file_desc = cr_open(orig, mode);
-    // FILE* destiny = fopen(dest, "wb");
-	int nbytes = 32;
-	unsigned char buffer[nbytes+1];
-	buffer[nbytes] = '\0';
-	printf("size: %d\n", file_desc->size);
+    FILE* destiny = fopen(dest, "wb");
+    if (destiny){
+
+        int nbytes = 512;
+        // uint8_t buffer[nbytes];
+        unsigned char buffer[nbytes];
+        // buffer[nbytes] = '\0';
+        // void* buffer[nbytes];
+        printf("size: %d\n", file_desc->size);
+        int bytes_readed = nbytes;
+        while (bytes_readed == nbytes)
+        {
+            bytes_readed = cr_read(file_desc, buffer, nbytes);
+            // printf("bytes_readed %d\n", bytes_readed);
+
+            // fwrite(buffer, 1, bytes_readed, destiny);
+            for (int i = 0; i < bytes_readed; i++)
+            {
+                printf("%u\t",buffer[i]);
+            }
 
 
-    while (cr_read(file_desc, buffer, nbytes))
-    {
-        // for (int byte = 0; byte < nbytes; byte++)
-        // {
-        //     fwrite(buffer + byte, 1, 1, destiny);
-        // }
-		printf("%s", buffer);
+
+            // fwrite(buffer, sizeof(char), sizeof(buffer), destiny);
+            
+
+            printf("\n");
+            for (int byte = 0; byte < bytes_readed; byte++)
+            {
+                fwrite(buffer + byte, 1, 1, destiny);
+            }
+        }
+        fclose(destiny);
     }
+    else{
+        printf("Error de path de destino %s", dest);
+    }
+    printf("Size %d\treaded%d\n", file_desc->size, file_desc->bytes_readed);
     cr_close(file_desc);
-    // fclose(destiny);
+    return 0;
+}
+
+int cr_unload(char* orig, char* dest){
+    // /* Función que se encarga de copiar un archivo o un ́arbol de directorios
+    // (es decir, un directorio y todos sus contenidos) del disco, referenciado por orig,
+    // hacia un nuevo archivo o directorio de ruta desten su computador.*/
+    
+    unload_file(orig, dest);
 
 
 
