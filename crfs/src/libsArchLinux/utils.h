@@ -1,5 +1,6 @@
 
 #pragma once
+#include "cr_API.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -26,16 +27,3 @@
 #define IDX_DDOB  4
 #define IDX_DTRI  4
 
-
-// typedef struct T{
-// 	int isLeaf;	// 1 when node is a leaf node
-// 	int        disk_addr;
-//     fsClass   blk_type;
-// 	struct T* character[CHAR_SIZE];
-// } Trie;
-
-/* Definiciones de Funciones */
-/* Funciones de LS */
-int readDirEntry(uint8_t *data);
-void utilsLS(char *path, FILE *disk);
-unsigned int getPointer(unsigned int start, char *name, FILE *disk);

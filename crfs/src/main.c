@@ -29,6 +29,9 @@ int main(int argc, char **argv){
     
     // char diskname = "simdiskformat.bin";
 	cr_mount(argv[1]);
+	
+	crFILE *f = cr_open("./memes/texto.txt", 'w');
+	cr_write(f, "Funcionaaa", 5);
 	// uint8_t val;
 	// uint8_t name[27];
 	// uint32_t pointer;
@@ -137,7 +140,7 @@ int main(int argc, char **argv){
 	// cr_exists("/memes/doya");
 	// //cr_rm("memes/sudo1.jpg");
 	// printf("--------------\n");
-	cr_ls("memes/../memes/../././memes");
+	// cr_ls("memes/../memes/../././memes");
 	//cr_exists("/memes/doya");
 	// char dir[32];
 	// int i = 0;
