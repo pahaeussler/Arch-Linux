@@ -134,10 +134,11 @@ int main(int argc, char **argv){
 	// fread(&block, sizeof(unsigned), 1, test);
 	// cr_bitmap(131, 0);
 	// printf("%d\n", 1025/1024);
-	cr_exists("/memes/doya");
-	cr_rm("memes/sudo1.jpg");
-	printf("--------------\n");
-	cr_exists("/memes/doya");
+	// cr_exists("/memes/doya");
+	// //cr_rm("memes/sudo1.jpg");
+	// printf("--------------\n");
+	cr_ls("memes/../memes/../././memes");
+	//cr_exists("/memes/doya");
 	// char dir[32];
 	// int i = 0;
 	// while (i<10)
