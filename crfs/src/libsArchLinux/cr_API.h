@@ -15,7 +15,9 @@ typedef struct crfile{
     bool overright;
     int block;
     char* path;
-    int pos;
+    int pos_index;
+    int pos_data;
+    int bytes_readed;
     int size;
 } crFILE;
 
