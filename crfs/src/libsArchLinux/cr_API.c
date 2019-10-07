@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <sys/stat.h>
+ #include <sys/types.h>
 
 
 /* VARIABLES GLOBALES */
@@ -394,6 +396,169 @@ void cr_ls(char* path){
         free(dir_arr);
         fclose(disk);
     }
+}
+void some_func()
+{
+    printf("some func\n");
+}
+
+int make_dir_recur(FILE* disk, uint32_t dir, char* dest)
+{
+    // printf("%s\n", dest);
+    fseek(disk, dir*1024, SEEK_SET);
+    for(int i = 0; i < 31; i++){
+        uint8_t valid;
+	    uint8_t name[27];
+	    uint32_t pointer;
+        fread(&valid, sizeof(uint8_t), 1, disk);
+        fread(&name, sizeof(uint8_t)*27, 1, disk);
+        uint32_t direction = get_pointer(disk);
+        if(strcmp(name, "")){
+            char* new_dest = calloc(strlen(dest) + strlen(name) + 2, sizeof(char));
+            strcpy(new_dest, dest);
+            strcat(new_dest, name);
+            strcat(new_dest, "/");
+            printf("%s\n", new_dest);
+            if(valid == 2)
+            {
+                mkdir(new_dest, 0777);
+                make_dir_recur(disk, direction, new_dest);
+                fseek(disk, dir*1024 + 32*i, SEEK_SET);
+            }
+            if(valid == 4)
+            {
+                some_func();
+            }
+            free(new_dest);
+        }
+    }
+    uint8_t valid;
+	uint8_t name[27];
+	uint32_t pointer;
+    fread(&valid, sizeof(uint8_t), 1, disk);
+    fread(&name, sizeof(uint8_t)*27, 1, disk);
+    uint32_t direction = get_pointer(disk);
+    char* new_dest = calloc(strlen(dest) + strlen(name) + 2, sizeof(char));
+    strcpy(new_dest, dest);
+    strcat(new_dest, "/");
+    strcat(new_dest, name);
+    // printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
+    if(valid == 32){
+        make_dir_recur(disk, direction, new_dest);
+    }
+    free(new_dest);
+    return 1;
+}
+
+int make_dir(FILE* disk, uint32_t dir, char* dest)
+{
+    
+    fseek(disk, dir*1024, SEEK_SET);
+    for(int i = 0; i < 31; i++){
+        uint8_t valid;
+	    uint8_t name[27];
+	    uint32_t pointer;
+        fread(&valid, sizeof(uint8_t), 1, disk);
+        fread(&name, sizeof(uint8_t)*27, 1, disk);
+        uint32_t direction = get_pointer(disk);
+        
+        if(valid == 2)
+        {
+            make_dir_recur(disk, direction, dest);
+        }
+        if(valid == 4)
+        {
+            some_func();
+        }
+    }
+    uint8_t valid;
+	uint8_t name[27];
+	uint32_t pointer;
+    fread(&valid, sizeof(uint8_t), 1, disk);
+    fread(&name, sizeof(uint8_t)*27, 1, disk);
+    uint32_t direction = get_pointer(disk);
+    // printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
+    if(valid == 32){
+        print_dir(disk, direction);
+    }
+    return 1;
+}
+
+int parse_dir_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from, char* dest)
+{
+    // printf("len %d, from: %d\n", len, from);
+    for(int i = 0; i < 31; i++){
+        uint8_t valid;
+	    uint8_t name[27];
+	    uint32_t pointer;
+        fread(&valid, sizeof(uint8_t), 1, disk);
+        fread(&name, sizeof(uint8_t)*27, 1, disk);
+        uint32_t direction = get_pointer(disk);
+        
+        // printf("name: %s\n", valid, name, direction);
+        if(!strcmp(name, path[from]))
+        {
+            // printf("entre %d\n", valid);
+            if(len == 1) {
+                int returnado = make_dir_recur(disk, direction, dest);
+                return returnado;
+            }
+            if(valid == 2 || valid == 8 || valid == 16)
+            {
+                fseek(disk, direction*1024, SEEK_SET);
+                if(parse_dir_recur(disk, path, len-1, direction, from + 1, dest)) {
+                    return 1;
+                }
+                // fseek(disk, my_dir*1024 + 32*(i+1), SEEK_SET);
+                // printf("he vuelto %u\n", my_dir);
+            }
+        }
+    }
+    uint8_t valid;
+	uint8_t name[27];
+	uint32_t pointer;
+    fread(&valid, sizeof(uint8_t), 1, disk);
+    fread(&name, sizeof(uint8_t)*27, 1, disk);
+    uint32_t direction = get_pointer(disk);
+    // printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
+    if(valid == 32){
+        fseek(disk, direction*1024, SEEK_SET);
+        parse_dir_recur(disk, path, len, direction, from, dest);
+    }
+    return 0;
+}
+
+
+int cr_unload(char* orig, char* dest){
+    /*Funcion para listar los elementos de un directorio del disco. Imprime en pan-talla los nombres de todos los archivos y directorios contenidos en el directorio indicado porpath. */
+    // FILE *disk = fopen(DISKNAME, "rb");
+    if(cr_exists(orig))
+    {
+        FILE *disk = fopen(DISKNAME, "rb");
+        char **dir_arr = calloc(20, sizeof(char*));
+        for(int i = 0; i < 20; i++){
+            dir_arr[i] = calloc(20, sizeof(char));
+        }
+        char *dirname = malloc(strlen(orig)+1);
+        strcpy(dirname, orig);
+        int val = 0;
+        char *stok = strtok(dirname, "/");
+        while(stok != NULL && val < 20){
+            strcpy(dir_arr[val], stok);
+            stok = strtok(NULL, "/");
+            val++;
+        }
+        parse_dir_recur(disk, dir_arr, val, 0, 0, dest);
+        free(dirname);
+        for(int i = 0; i < 20; i++)
+        {
+            free(dir_arr[i]);
+        }
+        free(dir_arr);
+        fclose(disk);
+        return 1;
+    }
+    return 0;
 }
 
 uint32_t reserve_unused_block()
@@ -818,11 +983,6 @@ int cr_rm(char* path){
     fclose(disk);
     return final;
 
-    return 0;
-}
-
-int cr_unload(char* orig, char* dest){
-    /* Función que se encarga de copiar un archivo o un ́arbolde directorios (es decir, un directorio ytodossus contenidos) del disco, referenciado por orig, hacia un nuevo archivo o directorio de rutadesten su computador.*/
     return 0;
 }
 

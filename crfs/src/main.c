@@ -11,6 +11,8 @@ To Run: ./crfs $PWD/dsk/simdiskfilled.bin
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <sys/stat.h>
+ #include <sys/types.h>
 
 
 #define getName(var) #var
@@ -137,7 +139,7 @@ int main(int argc, char **argv){
 	// cr_exists("/memes/doya");
 	// //cr_rm("memes/sudo1.jpg");
 	// printf("--------------\n");
-	cr_ls("memes/../memes/../././memes");
+	cr_ls("memes/../memes/../././memes/../dir/subdir");
 	//cr_exists("/memes/doya");
 	// char dir[32];
 	// int i = 0;
@@ -158,7 +160,7 @@ int main(int argc, char **argv){
   //printf("TEST cr_mount:\n\n");
 	//cr_mount(argv[1]);
 	//printf("%s Montado en %s\n\n", argv[1], getName(DISKNAME));
-	
+	parse_dir("", "");
 	
 	/* LS test: Por ahora sólo están descomentados los tests que fallan */
 	

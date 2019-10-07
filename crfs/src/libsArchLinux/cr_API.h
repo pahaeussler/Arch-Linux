@@ -40,4 +40,3 @@ int cr_close(crFILE*file_desc);                           // DONE
 int cr_rm(char*path);                                     // TODO
 int cr_unload(char*orig, char*dest);                      // TODO
 int cr_load(char*orig);                                   // TODO
-
