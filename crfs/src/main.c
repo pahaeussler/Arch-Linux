@@ -30,7 +30,7 @@ int main(int argc, char **argv){
     }
 	cr_mount(argv[1]);
 
-	char* orig = "/memes";
+	char* orig = "/memes/save.png";
 	// char* orig = "dir/texto.txt";
 	// char* orig = "Withered Leaf.mp3";
 	// char* out = "embeces.jpg";
