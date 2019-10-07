@@ -25,6 +25,7 @@
 
 /* Definiciones de Funciones */
 /* Funciones de LS */
-int readDirEntry(uint8_t *data);
+uint32_t readDirEntry(FILE *disk);
+uint8_t disk_exists(char *disk_path);
 void utilsLS(char *path, FILE *disk);
-unsigned int getPointer(unsigned int start, char *name, FILE *disk);
+uint32_t pointerGetter(uint32_t start, const char *name, FILE *disk);

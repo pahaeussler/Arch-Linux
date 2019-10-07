@@ -41,6 +41,7 @@ echo -e "${LBL}+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo -e "${LBL}|                             RUNNING CRFS                             |${NC}";
 echo -e "${LBL}|                                                                      |${NC}";
 echo -e "";
+# OPTIONS
 if [ $OP == "0" ]; 
 then
 ./crfs dsk/simdiskfilled.bin;
@@ -53,6 +54,19 @@ if [ $OP == "2" ];
 then
 time ./crfs dsk/simdiskfilled.bin;
 fi;
+if [ $OP == "3" ]; 
+then
+valgrind --track-origins=yes ./crfs dsk/simdiskformat.bin;
+fi;
+if [ $OP == "4" ]; 
+then
+valgrind ./crfs dsk/simdiskformat.bin;
+fi;
+if [ $OP == "5" ]; 
+then
+make clean;
+fi;
+
 echo -e "";
 echo -e "${LBL}|                                                                      |${NC}";
 echo -e "${LBL}|                              CRFS READY                              |${NC}";

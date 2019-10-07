@@ -38,23 +38,23 @@ int main(int argc, char **argv){
 	printf("\n\nCon input ./\n");
 	cr_ls("./");         // DONE
 	printf("\n\nCon input /\n");
-	cr_ls("/");          // DONE
+	cr_ls("/");          // DONE 
 	printf("\n\nCon input vacío\n");
-	cr_ls("");           // DONE
+	cr_ls("");           // DONE 
 	printf("\n\nCon input archivo de root\n");
 	cr_ls("intro.txt");  // DONE
 	printf("\n\nCon input carpetas de root\n");
-	cr_ls("dir");       // DONE
+	cr_ls("memes");       // DONE 
 	printf("\n\nCon input archivo de carpeta de root\n");
 	cr_ls("memes/loops.jpg");  // DONE */
 	printf("\n\nCon input carpeta de carpeta de root\n");
-    cr_ls("dir/subdir/.");  // TODO: no hay display, no muestra nada
+    cr_ls("dir/subdir");  // TODO: no hay display, no muestra nada
     /*printf("\n\nCon input padre de root simple\n");
     cr_ls("..");        // DONE
     printf("\n\nCon input padre de root con slash\n");
     cr_ls("/..");       // DONE
     printf("\n\nCon input padre de root con punto y slash\n");
-    cr_ls("./..");/*    // DONE*/
+    cr_ls("./..");    // DONE */
     printf("\n\nCon input padre de carpeta de root\n");
     cr_ls("memes/..");  // TODO: arreglar, muestra ls para /memes (carpeta de root, debería mostrar root))
     printf("\n\nCon input padre de carpeta de carpeta de root\n");

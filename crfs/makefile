@@ -7,7 +7,7 @@ CC = /usr/bin/gcc
 # Compiler Flags
 CFLAGS =
 # Linker Flags
-LDFLAGS =
+LDFLAGS = -lm
 
 
 # PATHS
@@ -38,10 +38,10 @@ BIN = crfs
 all: $(BIN)
 # Result from .o files
 $(BIN): $(OBJ)/$(OFS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -I$(HDR) -I$(SRC) $(OFS) -o $(BIN)
+	$(CC) $(CFLAGS) -I$(HDR) -I$(SRC) $(OFS) -o $(BIN) $(LDFLAGS)
 # .o files from .c files
 $(OBJ)/%.o: $(SRC)/%.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -I$(HDR) -I$(SRC) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(HDR) -I$(SRC) -c $< -o $@ $(LDFLAGS)
 # remove binaries and .o files
 clean:
 	$(RM) $(BIN) $(OFS)
