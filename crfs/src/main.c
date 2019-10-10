@@ -23,31 +23,26 @@ extern char* DISKNAME;
 int main(int argc, char **argv){
     /*
     Checking Correct Usage
-    */ 
+    */
     if(argc != 2){
     printf("Error: Wrong number of arguments: %d\n", argc);
     printf("Usage: ./crfs <disk path>\n");
     }
+
+
+	/* Test para cr_mount */
+
 	cr_mount(argv[1]);
+	printf("[cr_API/cr_mount]: Disco %s Montado", DISKNAME);
+	printf("\n\n\n\n");
 
-	char* orig = "/memes/save.png";
-	// char* orig = "dir/texto.txt";
-	// char* orig = "Withered Leaf.mp3";
-	// char* out = "embeces.jpg";
+	/* Test para ls */
+	printf("Test para cr_ls(./memes/../dir/./subdir/../../memes)\n");
+	cr_ls("./memes/../dir/./subdir/../../memes");
+	printf("\nTest para cr_ls(memes)\n\n");
+	cr_ls("memes");
+
 	
-	
-	// char* orig = "intro.txt";
-	// char* out = "out.txt";
-
-
-	// char* orig = "/embeces.jpg";
-	// char* out = "out.jpg";
-    char* out = "results";
-	
-	// char* orig = "memes/sudo1.jpg";
-
-	cr_unload(orig, out);
-    // cr_close(file_desc);
 
   return 0;
 }

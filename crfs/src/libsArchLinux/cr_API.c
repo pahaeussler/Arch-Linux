@@ -169,7 +169,7 @@ int cr_exists_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from)
         fread(&valid, sizeof(uint8_t), 1, disk);
         fread(&name, sizeof(uint8_t)*27, 1, disk);
         uint32_t direction = get_pointer(disk);
-        
+
         if(!strcmp(name, path[from]))
         {
             // printf("len: %d\n", len);
@@ -204,7 +204,7 @@ uint32_t cr_exists_direction_recur(FILE* disk, char** path, int len, uint32_t my
         fread(&valid, sizeof(uint8_t), 1, disk);
         fread(&name, sizeof(uint8_t)*27, 1, disk);
         uint32_t direction = get_pointer(disk);
-        
+
         if(!strcmp(name, path[from]))
         {
             if(len == 1) return direction;
@@ -258,7 +258,7 @@ uint32_t cr_exists_direction(char* path){
     fclose(disk);
 
     return returnado;
-    
+
 }
 
 int cr_exists(char* path){
@@ -287,8 +287,8 @@ int cr_exists(char* path){
     fclose(disk);
 
     return returnado;
-    
-    
+
+
 }
 
 void print_dir(FILE* disk, uint32_t dir)
@@ -301,7 +301,7 @@ void print_dir(FILE* disk, uint32_t dir)
         fread(&valid, sizeof(uint8_t), 1, disk);
         fread(&name, sizeof(uint8_t)*27, 1, disk);
         uint32_t direction = get_pointer(disk);
-        
+
         if(valid == 2 || valid == 4 || valid == 16 || valid == 8) printf("%s\n", name);
     }
     uint8_t valid;
@@ -326,7 +326,7 @@ void cr_ls_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from)
         fread(&valid, sizeof(uint8_t), 1, disk);
         fread(&name, sizeof(uint8_t)*27, 1, disk);
         uint32_t direction = get_pointer(disk);
-        
+
         // printf("name: %s\n", valid, name, direction);
         if(!strcmp(name, path[from]))
         {
@@ -472,7 +472,7 @@ int parse_dir_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from,
         fread(&valid, sizeof(uint8_t), 1, disk);
         fread(&name, sizeof(uint8_t)*27, 1, disk);
         uint32_t direction = get_pointer(disk);
-        
+
         // printf("name: %s\n", valid, name, direction);
         if(!strcmp(name, path[from]))
         {
@@ -488,7 +488,7 @@ int parse_dir_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from,
                     free(new_dest);
                     return 1;
                 }
-                
+
                 int returnado = make_dir_recur(disk, direction, origin, dest);
                 return returnado;
             }
@@ -496,7 +496,7 @@ int parse_dir_recur(FILE* disk, char** path, int len, uint32_t my_dir, int from,
             {
                 fseek(disk, direction*1024, SEEK_SET);
                 if(parse_dir_recur(disk, path, len-1, direction, from + 1, origin, dest)) {
-                    return 1; 
+                    return 1;
                 }
                 // fseek(disk, my_dir*1024 + 32*(i+1), SEEK_SET);
                 // printf("he vuelto %u\n", my_dir);
@@ -581,7 +581,7 @@ void free_used_block(uint32_t dir)
             {
                 to_write = bitmap;
             }
-            
+
         }
     }
     fseek(disk, 1024 + dir2, SEEK_SET);
@@ -627,7 +627,7 @@ int get_pos_on_directory(FILE* disk, uint32_t dir, char* dirname, char* my_name)
         fread(&valid, sizeof(uint8_t), 1, disk);
         fread(&name, sizeof(uint8_t)*27, 1, disk);
         uint32_t direction = get_pointer(disk);
-        
+
         // printf("value: %d, name: %s, dir: %u\n", valid, name, direction);
         if(valid != 2 && valid != 4 && valid != 8)
         {
@@ -660,7 +660,7 @@ int get_pos_on_directory(FILE* disk, uint32_t dir, char* dirname, char* my_name)
         direction = create_new_dir_cont(disk, dir, my_name);
         return get_pos_on_directory(disk, direction, dirname, my_name);
     }
-    
+
     return 0;
 }
 
@@ -747,7 +747,7 @@ crFILE* cr_open(char* path, char mode){
             free(crfile);
             return NULL;
         }
-        
+
     }
 }
 
@@ -763,9 +763,9 @@ int read(crFILE* file_desc, void* buffer, uint32_t pointer, int byte){
 
 
 int cr_read(crFILE* file_desc, void* buffer, int nbytes){
-    /* Función para leer archivos. Leelos siguientes n bytes desde el archivo descrito por file_desc y los guarda en la 
+    /* Función para leer archivos. Leelos siguientes n bytes desde el archivo descrito por file_desc y los guarda en la
     dirección apuntada por buffer. Debe retornar la cantidad de Byte efectivamente leidos desde el archivo.
-    Esto es importante si nbytes es mayor a la cantidad de Byte restantes en el archivo. 
+    Esto es importante si nbytes es mayor a la cantidad de Byte restantes en el archivo.
     La lectura dereadse efectúa desde la posicióndel archivo inmediatamente posterior a la última
     posición leída por un llamado a read.*/
     FILE* disk = fopen(DISKNAME, "rb");
@@ -824,7 +824,7 @@ void rm_index(FILE* disk, uint32_t dir)
     fseek(disk, dir*1024, SEEK_SET);
     uint32_t file_size = get_pointer(disk);
     int size = 251;
-    if((file_size-1)/1024 <= 251) size = (file_size-1)/1024;  
+    if((file_size-1)/1024 <= 251) size = (file_size-1)/1024;
     for(int i = 0; i <= size; i++)
     {
         uint32_t pointer = get_pointer(disk);
