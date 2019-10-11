@@ -42,7 +42,13 @@ int main(int argc, char **argv){
 	printf("\nTest para cr_ls(memes)\n\n");
 	cr_ls("memes");
 
-	
+/* Test para exists */
+	printf("Test para cr_exists(./memes/../dir/./subdir/../../memes): %d\n", cr_exists("./memes/../dir/./subdir/../../memes"));
+	printf("\nTest para cr_ls(memes): %d\n\n", cr__exists("memes"));
+	printf("Test para cr_exists(./memes/../dir/./subdir/../../pepes): %d\n", cr_exists("./memes/../dir/./subdir/../../memes"));
+	printf("\nTest para cr_ls(memes): %d\n\n", cr__exists("pepes"));
+
+
 
   return 0;
 }
