@@ -8,7 +8,7 @@
 | :----- | :----------: | :--: |
 | Pablo Haeussler* | 14620138 | pahaeussler@uc.cl |
 | Cristobal Poblete | 15623688 | cmpoblete@uc.cl |
-| Alfonso Aguirre |15621863 | aaguirrebena@uc.cl |
+| Alfonso Aguirrebeña |15621863 | aaguirrebena@uc.cl |
 | Henry Blair González | 13634372 | hblair1@uc.cl |
 
 *Este proyecto se subirá en la carpeta de este usuario del servidor
